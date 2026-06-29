@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>測試組現況問卷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF1F3;
+    --surface:#FFFFFF;
+    --ink:#16212B;
+    --ink-soft:#53626F;
+    --ink-faint:#8E9AA5;
+    --line:#E2E7EB;
+    --line-strong:#CDD5DB;
+    --accent:#0E7468;
+    --accent-ink:#0A4D45;
+    --accent-soft:#E2F1EE;
+    --accent-ring:rgba(14,116,104,.28);
+    --warn:#B5471E;
+    --warn-soft:#FBEDE6;
+    --field:#F7F9FA;
+    --radius:14px;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --display:'Space Grotesk','Noto Sans TC',sans-serif;
+    --body:'Noto Sans TC',system-ui,-apple-system,'Microsoft JhengHei',sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- customize style ---------- */
+  .m-b-4{
+    display: inline-block;
+    margin-bottom:6px;
+  }
+  .m-y-10{
+    margin-top:16px;
+    margin-bottom:16px;
+  }
+
+  /* ---------- sticky progress bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(238,241,243,.86);
+    backdrop-filter:saturate(140%) blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:760px;margin:0 auto;
+    padding:10px 24px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .topbar-label{
+    font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+    color:var(--ink-soft);white-space:nowrap;
+  }
+  .topbar-label b{color:var(--accent);font-weight:600;}
+  .meter{
+    flex:1;height:6px;border-radius:99px;background:var(--line-strong);
+    overflow:hidden;
+  }
+  .meter-fill{
+    height:100%;width:0%;border-radius:99px;
+    background:var(--accent);
+    transition:width .35s ease;
+  }
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px 96px;}
+
+  header.intro{padding:56px 0 36px;}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent-ink);
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";width:26px;height:1.5px;background:var(--accent);display:inline-block;
+  }
+  h1{
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(30px,6vw,44px);line-height:1.12;
+    letter-spacing:-.01em;margin:0 0 18px;
+  }
+  .lede{
+    color:var(--ink-soft);font-size:16.5px;max-width:60ch;margin:0 0 24px;
+  }
+  .note-card{
+    background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);
+    border-radius:10px;padding:18px 20px;
+    font-size:14.5px;color:var(--ink-soft);
+  }
+  .note-card ul{margin:8px 0 0;padding-left:18px;}
+  .note-card li{margin:4px 0;}
+  .note-card b{color:var(--ink);font-weight:500;}
+
+  /* ---------- sections ---------- */
+  section.block{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:30px 30px 34px;
+    margin-top:22px;
+  }
+  .sec-head{
+    display:flex;align-items:baseline;gap:14px;
+    padding-bottom:18px;margin-bottom:24px;
+    border-bottom:1px solid var(--line);
+  }
+  .sec-num{
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    color:var(--accent);letter-spacing:.05em;
+    padding-top:3px;
+  }
+  .sec-title{font-family:var(--display);font-weight:600;font-size:21px;margin:0;}
+  .sec-sub{font-size:13px;color:var(--ink-faint);margin:2px 0 0;font-weight:400;font-family:var(--body);}
+
+  .q{margin-bottom:26px;}
+  .q:last-child{margin-bottom:0;}
+  .q-label{display:block;font-weight:500;font-size:15.5px;margin-bottom:4px;}
+  .q-num{font-family:var(--mono);color:var(--accent-ink);font-weight:600;margin-right:6px;font-size:14px;}
+  .q-hint{font-size:13px;color:var(--ink-faint);margin:0 0 12px;}
+
+  /* ---------- inputs ---------- */
+  input[type=text], textarea, .pct-input{
+    width:100%;font-family:var(--body);font-size:15px;color:var(--ink);
+    background:var(--field);
+    border:1px solid var(--line-strong);border-radius:9px;
+    padding:11px 13px;transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  textarea{resize:vertical;min-height:84px;line-height:1.55;}
+  input[type=text]:focus, textarea:focus, .pct-input:focus{
+    outline:none;border-color:var(--accent);background:#fff;
+    box-shadow:0 0 0 3px var(--accent-ring);
+  }
+  input::placeholder, textarea::placeholder{color:var(--ink-faint);}
+
+  .field-row{display:grid;gap:12px;}
+  .sub-label{font-size:13px;color:var(--ink-soft);margin-bottom:5px;display:block;}
+
+  /* options (radio / checkbox) */
+  .opts{display:flex;flex-direction:column;gap:9px;}
+  .opts.inline{flex-flow:row wrap;gap:9px;}
+  .opt{
+    display:flex;align-items:center;gap:10px;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:9px;
+    padding:10px 13px;font-size:14.5px;background:var(--field);
+    transition:border-color .15s, background .15s;
+    user-select:none;
+  }
+  .opts.inline .opt{flex:0 1 auto;}
+  .opt:hover{border-color:var(--line-strong);background:#fff;}
+  .opt input{
+    appearance:none;-webkit-appearance:none;margin:0;flex:none;
+    width:18px;height:18px;border:1.5px solid var(--line-strong);
+    background:#fff;cursor:pointer;transition:all .12s;position:relative;
+  }
+  .opt input[type=radio]{border-radius:50%;}
+  .opt input[type=checkbox]{border-radius:5px;}
+  .opt input:checked{background:var(--accent);border-color:var(--accent);}
+  .opt input[type=checkbox]:checked::after{
+    content:"";position:absolute;left:5px;top:1.5px;width:5px;height:9px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .opt input[type=radio]:checked::after{
+    content:"";position:absolute;left:4px;top:4px;width:6px;height:6px;border-radius:50%;background:#fff;
+  }
+  .opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft);}
+  .opt input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .opt .free{
+    border:none;background:transparent;border-bottom:1px solid var(--line-strong);
+    border-radius:0;padding:2px 4px;font-size:14px;width:140px;flex:none;
+  }
+  .opt .free:focus{box-shadow:none;border-bottom-color:var(--accent);}
+
+  /* step list */
+  .steps{display:flex;flex-direction:column;gap:8px;}
+  .step-row{display:flex;align-items:center;gap:10px;}
+  .step-idx{
+    font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:600;
+    width:24px;text-align:right;flex:none;
+  }
+  .btn-add{
+    align-self:flex-start;margin-top:4px;
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    background:none;border:1px dashed var(--line-strong);border-radius:8px;
+    padding:7px 14px;cursor:pointer;transition:all .15s;
+  }
+  .btn-add:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .btn-add.btn-muted{color:var(--ink-soft);}
+  .btn-add.btn-link{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+  .flow-return-card{
+    border:1px dashed var(--line-strong);
+    background:var(--field);
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .flow-return-main{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .flow-return-status{font-size:13px;color:var(--ink-soft);margin-top:10px;}
+  .flow-md{min-height:180px;font-family:var(--mono);font-size:13px;background:#fff;}
+
+  /* percentage table */
+  .pct-table{display:flex;flex-direction:column;gap:8px;}
+  .pct-row{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center;}
+  .pct-row label{font-size:14.5px;color:var(--ink);}
+  .pct-cell{display:flex;align-items:center;gap:6px;}
+  .pct-input{text-align:right;padding:9px 8px;}
+  .pct-cell .pct-unit{font-family:var(--mono);font-size:13px;color:var(--ink-faint);}
+  .pct-sum{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:6px;padding:9px 13px;border-radius:8px;
+    background:var(--field);font-size:13.5px;color:var(--ink-soft);
+    font-family:var(--mono);
+  }
+  .pct-sum.ok{background:var(--accent-soft);color:var(--accent-ink);}
+  .pct-sum.over{background:var(--warn-soft);color:var(--warn);}
+  .pct-sum b{font-weight:600;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* ---------- export footer ---------- */
+  .export{
+    margin-top:34px;background:var(--ink);color:#fff;
+    border-radius:var(--radius);padding:28px 30px;
+  }
+  .export h2{font-family:var(--display);font-size:19px;margin:0 0 6px;font-weight:600;}
+  .export p{color:#AEBCC6;font-size:14px;margin:0 0 20px;}
+  .export-btns{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--body);font-size:15px;font-weight:500;cursor:pointer;
+    border-radius:10px;padding:13px 22px;border:1px solid transparent;
+    display:inline-flex;align-items:center;gap:9px;transition:all .15s;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:#0c8678;}
+  .btn-ghost{background:transparent;color:#fff;border-color:#3A4750;}
+  .btn-ghost:hover{border-color:#5A6770;background:rgba(255,255,255,.04);}
+  .btn:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  .export-status{margin-top:16px;font-family:var(--mono);font-size:13px;color:#7FD8C9;min-height:18px;}
+
+  footer.sig{text-align:center;color:var(--ink-faint);font-size:13px;margin-top:36px;}
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:12px 22px;border-radius:99px;
+    font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:all .25s;z-index:50;
+    font-family:var(--body);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:560px){
+    .wrap{padding:0 16px 72px;}
+    section.block{padding:24px 18px 26px;}
+    .grid-2{grid-template-columns:1fr;}
+    .topbar-inner{padding:9px 16px;}
+    header.intro{padding:40px 0 28px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="topbar-label">已完成 <b id="doneCount">0</b> / 16 題</span>
+    <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="intro">
+    <div class="eyebrow">測試組現況訪談前問卷</div>
+    <h1>先了解你的工作現況,<br>訪談就能聊得更深</h1>
+    <p class="lede">這份問卷是正式訪談前的暖身。先把流程與基本狀況寫下來,訪談時我們就不必花時間問基本資料,可以直接深入討論真正的問題。</p>
+    <div class="note-card">
+      <b>填寫小提醒</b>
+      <ul>
+        <li>不必寫得完美,<b>用日常的說法、憑印象估</b>就好。</li>
+        <li>數字欄位<b>抓大概</b>即可(例如「大約 2~3 天」)。</li>
+        <li>不確定或不適用的,直接寫「不確定」。</li>
+        <li>填完請按最下方的<b>複製或下載</b>,把內容回傳給我。本頁不會自動儲存。</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- 一、基本資料 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div><h2 class="sec-title">基本資料</h2></div>
+    </div>
+
+    <div class="q">
+      <label class="q-label" for="f-name">稱呼</label>
+      <input type="text" id="f-name" data-q="稱呼" placeholder="怎麼稱呼你">
+    </div>
+
+    <div class="q" data-q="角色">
+      <span class="q-label">在測試組的角色</span>
+      <div class="opts inline" data-name="role">
+        <label class="opt"><input type="radio" name="role" value="測試執行人員">測試執行人員</label>
+        <label class="opt"><input type="radio" name="role" value="資深測試 / Lead">資深測試 / Lead</label>
+        <label class="opt"><input type="radio" name="role" value="主管">主管</label>
+        <label class="opt"><input type="radio" name="role" value="其他">其他</label>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="q">
+        <label class="q-label" for="f-product">主要負責的產品 / 模組</label>
+        <input type="text" id="f-product" data-q="主要負責的產品 / 模組" placeholder="例如:會員系統前台">
+      </div>
+      <div class="q">
+        <label class="q-label" for="f-tenure">在這個團隊大約多久</label>
+        <input type="text" id="f-tenure" data-q="在團隊多久" placeholder="例如:約 2 年">
+      </div>
+    </div>
+  </section>
+
+  <!-- 二、測試流程現況 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div>
+        <h2 class="sec-title">測試流程現況</h2>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q1 新需求的測試流程圖">
+      <span class="q-label"><span class="q-num">Q1</span>一個新需求從你接到、到測完回報,大致會經過哪些步驟?</span>
+      <p class="q-hint">請開啟流程圖編輯器，在新分頁完成流程圖後，按「回填到問卷」。系統會把流程圖整理成 Markdown 格式帶回本題。</p>
+      <div class="flow-return-card">
+        <div class="flow-return-main">
+          <a class="btn-add btn-link" id="openFlowEditor" href="./flow-editor.html?returnKey=qa_flow_markdown_return" target="_blank" rel="opener">開啟流程圖編輯器</a>
+          <button type="button" class="btn-add btn-muted" id="clearFlowMd">清空回填內容</button>
+        </div>
+        <div class="flow-return-status" id="flowReturnStatus">尚未回填流程圖 Markdown</div>
+      </div>
+      <textarea id="flowMarkdown" class="flow-md" data-sub="流程圖 Markdown" readonly placeholder="流程圖完成後，Markdown 會自動回填到這裡。"></textarea>
+    </div>
+
+    <div class="q" data-track data-q="Q2 最花時間 / 最常卡住的步驟">
+      <span class="q-label"><span class="q-num">Q2</span>哪一步最花時間?哪一步最常卡住?</span>
+      <div class="field-row">
+        <div><span class="sub-label">最花時間的步驟</span><input type="text" data-sub="最花時間" placeholder=""></div>
+        <div><span class="sub-label">最常卡住的步驟</span><input type="text" data-sub="最常卡住" placeholder=""></div>
+        <div><span class="sub-label">卡住通常是因為</span><textarea data-sub="卡住原因" placeholder=""></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 三、時間與工作量 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div>
+        <h2 class="sec-title">時間與工作量</h2>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q3 案例的測試耗時">
+      <span class="q-label"><span class="q-num">Q3</span>請以你「最近做過、有印象的一個需求」為例,填寫以下幾欄。
+    （用真實案例比估平均更準,挑一個有印象的就好)</span>
+      <div class="m-y-10">
+        <label class="m-b-4">這個需求大致是什麼</label>
+        <input type="text" data-sub="測試耗時_需求內容" placeholder="例如:會員登入改版">
+      </div>
+      <div class="m-y-10">
+        <label class="m-b-4">涉及幾個畫面 / 流程</label>
+        <input type="text" data-sub="測試耗時_畫面/流程" placeholder="例如:約 3 個畫面">
+      </div>
+      <div class="m-y-10">
+        <label class="m-b-4">大約衍生多少測試案例</label>
+        <input type="text" data-sub="測試耗時_測試案例數量" placeholder="例如:約 20~30 條">
+      </div>
+      <div class="m-y-10">
+        <label class="m-b-4">從頭到尾測了多久</label>
+        <input type="text" data-sub="測試耗時_執行測試時間" placeholder="例如:約 3 個工作天">
+      </div>
+      <div class="m-y-10">
+        <label class="m-b-4">這次有需要其他組支援嗎</label>
+        <input type="text" data-sub="測試耗時_別組支援" placeholder="例如:無 / 有,轉站找 OO 組">
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q4 一週工作時間分配">
+      <span class="q-label"><span class="q-num">Q4</span>你一週的工作時間大致怎麼分配?</span>
+      <p class="q-hint">填百分比,加起來大約 100% 即可。</p>
+      <div class="pct-table" id="pctTable">
+        <div class="pct-row"><label>撰寫測試案例</label><div class="pct-cell"><input type="text" inputmode="numeric" class="pct-input" data-pct="撰寫測試案例"><span class="pct-unit">%</span></div></div>
+        <div class="pct-row"><label>執行測試</label><div class="pct-cell"><input type="text" inputmode="numeric" class="pct-input" data-pct="執行測試"><span class="pct-unit">%</span></div></div>
+        <div class="pct-row"><label>確認需求 / 溝通</label><div class="pct-cell"><input type="text" inputmode="numeric" class="pct-input" data-pct="確認需求溝通"><span class="pct-unit">%</span></div></div>
+        <div class="pct-row"><label>回報 / 追蹤缺陷</label><div class="pct-cell"><input type="text" inputmode="numeric" class="pct-input" data-pct="回報追蹤缺陷"><span class="pct-unit">%</span></div></div>
+        <div class="pct-row"><label>其他</label><div class="pct-cell"><input type="text" inputmode="numeric" class="pct-input" data-pct="其他"><span class="pct-unit">%</span></div></div>
+      </div>
+      <div class="pct-sum" id="pctSum"><span>目前合計</span><span><b id="pctTotal">0</b>%</span></div>
+    </div>
+
+    <div class="q" data-track data-q="Q5 回歸測試 / 重複測試">
+      <span class="q-label"><span class="q-num">Q5</span>有沒有「每次版本更新都要重跑一遍」的回歸測試?</span>
+      <div class="opts inline" data-name="regress">
+        <label class="opt"><input type="radio" name="regress" value="有">有</label>
+        <label class="opt"><input type="radio" name="regress" value="沒有">沒有</label>
+        <label class="opt"><input type="radio" name="regress" value="不確定">不確定</label>
+      </div>
+      <div class="grid-2" style="margin-top:12px">
+        <div><span class="sub-label">若有,手動跑一輪大約多久</span><input type="text" data-sub="回歸一輪耗時" placeholder=""></div>
+        <div><span class="sub-label">這類重複測試大約佔你工作</span><input type="text" data-sub="重複測試佔比" placeholder="例如:約 20%"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 四、需求輸入 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div>
+        <h2 class="sec-title">需求輸入的型態</h2>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q6 寫測試案例的依據">
+      <span class="q-label"><span class="q-num">Q6</span>你寫測試案例時,主要依據什麼?(可複選)</span>
+      <div class="opts" data-name="basis">
+        <label class="opt"><input type="checkbox" value="UI 原型 / 設計稿">UI 原型 / 設計稿</label>
+        <label class="opt"><input type="checkbox" value="書面功能規格 / 需求文件">書面功能規格 / 需求文件</label>
+        <label class="opt"><input type="checkbox" value="User Story 或驗收條件">User Story 或驗收條件</label>
+        <label class="opt"><input type="checkbox" value="口頭溝通 / 開會">口頭溝通 / 開會</label>
+        <label class="opt"><input type="checkbox" value="其他" data-other>其他<input type="text" class="free" placeholder="請說明"></label>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q7 確認需求細節的成本">
+      <span class="q-label"><span class="q-num">Q7</span>如果拿到的資料不夠清楚,寫案例前要花多少時間確認需求細節?</span>
+      <div class="field-row">
+        <div><span class="sub-label">大約耗時</span><input type="text" data-sub="確認耗時" placeholder=""></div>
+        <div><span class="sub-label">通常要找誰確認</span><input type="text" data-sub="找誰確認" placeholder=""></div>
+        <div><span class="sub-label">確認通常要等多久才有回覆</span><input type="text" data-sub="等待回覆" placeholder=""></div>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q8 需求理解錯誤導致重測">
+      <span class="q-label"><span class="q-num">Q8</span>有沒有「測完才發現需求理解錯,要重測」的情況?</span>
+      <div class="opts inline" data-name="rework">
+        <label class="opt"><input type="radio" name="rework" value="經常">經常</label>
+        <label class="opt"><input type="radio" name="rework" value="偶爾">偶爾</label>
+        <label class="opt"><input type="radio" name="rework" value="很少">很少</label>
+        <label class="opt"><input type="radio" name="rework" value="幾乎沒有">幾乎沒有</label>
+      </div>
+      <div style="margin-top:12px"><span class="sub-label">若有,通常是什麼原因造成的</span><textarea data-sub="重測原因" placeholder=""></textarea></div>
+    </div>
+  </section>
+
+  <!-- 五、跨組依賴 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div>
+        <h2 class="sec-title">跨組依賴(轉站 / 求援)</h2>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q9 需要其他組支援的情境">
+      <span class="q-label"><span class="q-num">Q9</span>哪些測試情境需要其他組支援?</span>
+      <textarea data-sub="跨組情境" placeholder=""></textarea>
+    </div>
+
+    <div class="q" data-track data-q="Q10 為什麼要其他組做">
+      <span class="q-label"><span class="q-num">Q10</span>為什麼這些一定要其他組做?(可複選)</span>
+      <div class="opts" data-name="dep">
+        <label class="opt"><input type="checkbox" value="只有他們有權限">只有他們有權限</label>
+        <label class="opt"><input type="checkbox" value="需要他們才有的環境 / 工具">需要他們才有的環境 / 工具</label>
+        <label class="opt"><input type="checkbox" value="只有他們懂相關知識">只有他們懂相關知識</label>
+        <label class="opt"><input type="checkbox" value="其他" data-other>其他<input type="text" class="free" placeholder="請說明"></label>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q11 跨組支援頻率與等待">
+      <span class="q-label"><span class="q-num">Q11</span>這類跨組支援多常發生?平均要等多久才有人協助?</span>
+      <div class="grid-2">
+        <div><span class="sub-label">頻率</span><input type="text" data-sub="頻率" placeholder="例如:一個月 2~3 次"></div>
+        <div><span class="sub-label">等待時間</span><input type="text" data-sub="等待時間" placeholder=""></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 六、過去自動化 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div>
+        <h2 class="sec-title">過去自動化的經驗</h2>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q12 是否參與過自動化導入">
+      <span class="q-label"><span class="q-num">Q12</span>你有參與過過去的自動化測試導入嗎?</span>
+      <div class="opts inline" data-name="autoexp">
+        <label class="opt"><input type="radio" name="autoexp" value="有參與">有參與</label>
+        <label class="opt"><input type="radio" name="autoexp" value="知道但沒參與">知道但沒參與</label>
+        <label class="opt"><input type="radio" name="autoexp" value="不清楚這件事">不清楚這件事</label>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q13 過去工具與現況">
+      <span class="q-label"><span class="q-num">Q13</span>(若知情)過去用什麼工具?那些成果現在還在用嗎?</span>
+      <div style="margin-bottom:12px"><span class="sub-label">工具</span><input type="text" data-sub="工具" placeholder=""></div>
+      <div class="opts inline" data-name="autostatus">
+        <label class="opt"><input type="radio" name="autostatus" value="還在用">還在用</label>
+        <label class="opt"><input type="radio" name="autostatus" value="部分還在">部分還在</label>
+        <label class="opt"><input type="radio" name="autostatus" value="已停用">已停用</label>
+        <label class="opt"><input type="radio" name="autostatus" value="不確定">不確定</label>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q14 自動化未落地的關鍵原因">
+      <span class="q-label"><span class="q-num">Q14</span>你覺得當時自動化「沒有全面落地」,最關鍵的原因是什麼?</span>
+      <p class="q-hint">這題很重要,請憑你的真實觀察寫,沒有標準答案。</p>
+      <textarea data-sub="未落地原因" placeholder="" style="min-height:110px"></textarea>
+    </div>
+  </section>
+
+  <!-- 七、開放欄 -->
+  <section class="block">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <div>
+        <h2 class="sec-title">開放欄</h2>
+        <p class="sec-sub">訪談時會深入聊</p>
+      </div>
+    </div>
+
+    <div class="q" data-track data-q="Q15 最希望工具幫你做的事">
+      <span class="q-label"><span class="q-num">Q15</span>如果有一個工具能幫你做掉某一件事,你最希望它幫你做什麼?</span>
+      <textarea data-sub="最希望" placeholder=""></textarea>
+    </div>
+
+    <div class="q" data-track data-q="Q16 其他想補充的困擾">
+      <span class="q-label"><span class="q-num">Q16</span>還有什麼這份問卷沒問到、但你覺得很重要的問題或困擾?</span>
+      <textarea data-sub="其他補充" placeholder=""></textarea>
+    </div>
+  </section>
+
+  <!-- export -->
+  <div class="export">
+    <h2>填好了嗎?把內容回傳給我</h2>
+    <p>本頁不會自動儲存。按下方任一鍵,即可把你的填答整理成文字,複製或下載後回傳。</p>
+    <div class="export-btns">
+      <button class="btn btn-primary" id="btnCopy">複製填答內容</button>
+      <button class="btn btn-ghost" id="btnDownload">下載為文字檔</button>
+    </div>
+    <div class="export-status" id="exportStatus"></div>
+  </div>
+
+  <footer class="sig">測試組 AI 導入專案 · 訪談前資料蒐集</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- dynamic step list ---------- */
+  var stepList = document.getElementById('stepList');
+  var addStepBtn = document.getElementById('addStep');
+  if(stepList && addStepBtn){
+    addStepBtn.addEventListener('click', function(){
+      var n = stepList.children.length + 1;
+      var row = document.createElement('div');
+      row.className = 'step-row';
+      row.innerHTML = '<span class="step-idx">'+n+'.</span><input type="text" class="step-in" placeholder="">';
+      stepList.appendChild(row);
+      row.querySelector('input').focus();
+      bindProgress(row.querySelector('input'));
+    });
+  }
+
+  /* ---------- flowchart editor return ---------- */
+  var FLOW_RETURN_KEY = 'qa_flow_markdown_return';
+  var flowMarkdown = document.getElementById('flowMarkdown');
+  var flowReturnStatus = document.getElementById('flowReturnStatus');
+  var openFlowEditorBtn = document.getElementById('openFlowEditor');
+  var clearFlowMdBtn = document.getElementById('clearFlowMd');
+
+  function setFlowMarkdown(md){
+    if(!flowMarkdown) return;
+    flowMarkdown.value = md || '';
+    flowMarkdown.dispatchEvent(new Event('input', {bubbles:true}));
+    if(flowReturnStatus){
+      flowReturnStatus.textContent = md && md.trim() ? '✓ 已回填流程圖 Markdown，可繼續填寫問卷' : '尚未回填流程圖 Markdown';
+    }
+    updateProgress();
+  }
+
+  function flowEditorUrl(){
+    return './flow-editor.html?returnKey=' + encodeURIComponent(FLOW_RETURN_KEY);
+  }
+
+  if(openFlowEditorBtn){
+    openFlowEditorBtn.setAttribute('href', flowEditorUrl());
+    openFlowEditorBtn.addEventListener('click', function(){
+      // 使用真正的超連結開新分頁，避免 window.open 在部分瀏覽器 / file:// 環境失效。
+      // 這裡只負責先把目前 Q1 內容暫存，讓流程圖頁可讀取既有內容。
+      try{ localStorage.setItem(FLOW_RETURN_KEY, flowMarkdown ? flowMarkdown.value : ''); }catch(e){}
+    });
+  }
+
+  if(clearFlowMdBtn){
+    clearFlowMdBtn.addEventListener('click', function(){
+      setFlowMarkdown('');
+      try{ localStorage.removeItem(FLOW_RETURN_KEY); }catch(e){}
+    });
+  }
+
+  window.addEventListener('message', function(event){
+    var data = event.data || {};
+    if(data.type === 'QA_FLOW_MD') setFlowMarkdown(data.md || '');
+  });
+  window.addEventListener('storage', function(event){
+    if(event.key === FLOW_RETURN_KEY && event.newValue !== null) setFlowMarkdown(event.newValue);
+  });
+  window.addEventListener('focus', function(){
+    try{
+      var md = localStorage.getItem(FLOW_RETURN_KEY);
+      if(md && flowMarkdown && md !== flowMarkdown.value) setFlowMarkdown(md);
+    }catch(e){}
+  });
+
+  /* ---------- percentage live total ---------- */
+  var pctSum = document.getElementById('pctSum');
+  var pctTotal = document.getElementById('pctTotal');
+  function num(v){ var n = parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?0:n; }
+  function updatePct(){
+    var t = 0;
+    document.querySelectorAll('.pct-input').forEach(function(i){ t += num(i.value); });
+    pctTotal.textContent = Math.round(t);
+    pctSum.classList.remove('ok','over');
+    if(t > 0 && t <= 100 && t >= 95) pctSum.classList.add('ok');
+    else if(t > 100) pctSum.classList.add('over');
+  }
+  document.querySelectorAll('.pct-input').forEach(function(i){ i.addEventListener('input', updatePct); });
+
+  /* ---------- progress meter ---------- */
+  var trackBlocks = Array.prototype.slice.call(document.querySelectorAll('.q[data-track]'));
+  var doneCount = document.getElementById('doneCount');
+  var meterFill = document.getElementById('meterFill');
+  function blockAnswered(block){
+    var ins = block.querySelectorAll('input, textarea');
+    for(var i=0;i<ins.length;i++){
+      var el = ins[i];
+      if((el.type==='radio'||el.type==='checkbox')){ if(el.checked) return true; }
+      else if(el.value && el.value.trim()!=='') return true;
+    }
+    return false;
+  }
+  function updateProgress(){
+    var done = 0;
+    trackBlocks.forEach(function(b){ if(blockAnswered(b)) done++; });
+    doneCount.textContent = done;
+    meterFill.style.width = (done/trackBlocks.length*100)+'%';
+  }
+  function bindProgress(el){
+    var ev = (el.type==='radio'||el.type==='checkbox') ? 'change' : 'input';
+    el.addEventListener(ev, updateProgress);
+  }
+  document.querySelectorAll('input, textarea').forEach(bindProgress);
+
+  /* ---------- collect answers ---------- */
+  function checkedRadio(name){
+    var el = document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '';
+  }
+  function checkedBoxes(scope){
+    var out = [];
+    scope.querySelectorAll('input[type=checkbox]:checked').forEach(function(c){
+      var v = c.value;
+      if(c.parentElement.hasAttribute('data-other')){
+        var free = c.parentElement.querySelector('.free');
+        if(free && free.value.trim()) v = '其他:'+free.value.trim();
+      }
+      out.push(v);
+    });
+    return out.join('、');
+  }
+  function collect(){
+    var L = [];
+    L.push('===== 測試組現況問卷 · 填答內容 =====');
+    L.push('');
+    document.querySelectorAll('section.block').forEach(function(sec){
+      L.push('【'+sec.querySelector('.sec-num').textContent+'. '+sec.querySelector('.sec-title').textContent+'】');
+
+      sec.querySelectorAll('.q').forEach(function(q){
+        var label = q.getAttribute('data-q');
+
+        // basic-info single input (data-q lives on the input itself)
+        if(!label){
+          var self = q.querySelector('input[data-q]');
+          if(self){ L.push('- '+self.getAttribute('data-q')+':'+(self.value.trim()||'(未填)')); }
+          return;
+        }
+
+        // flowchart markdown returned from editor
+        if(q.querySelector('.flow-md')){
+          var md = q.querySelector('.flow-md').value.trim();
+          L.push('- '+label+':');
+          if(md){
+            L.push('');
+            L.push(md);
+            L.push('');
+          }else{
+            L.push('    (未回填)');
+          }
+          return;
+        }
+
+        // step list
+        if(q.querySelector('.steps')){
+          L.push('- '+label+':');
+          q.querySelectorAll('.step-in').forEach(function(s,idx){
+            if(s.value.trim()) L.push('    '+(idx+1)+'. '+s.value.trim());
+          });
+          return;
+        }
+
+        // percentage table
+        if(q.querySelector('.pct-table')){
+          var parts=[];
+          q.querySelectorAll('.pct-input').forEach(function(p){
+            if(p.value.trim()) parts.push(p.getAttribute('data-pct')+' '+num(p.value)+'%');
+          });
+          L.push('- '+label+':'+(parts.length?' '+parts.join('、'):' (未填)'));
+          return;
+        }
+
+        // header line based on primary control
+        var radio = q.querySelector('input[type=radio]');
+        var box = q.querySelector('input[type=checkbox]');
+        var subs = q.querySelectorAll('[data-sub]');
+
+        if(radio){
+          L.push('- '+label+':'+(checkedRadio(radio.name)||'(未選)'));
+        } else if(box){
+          L.push('- '+label+':'+(checkedBoxes(q)||'(未選)'));
+        } else {
+          L.push('- '+label+(subs.length?':':':(未填)'));
+        }
+
+        // sub-labelled fields
+        subs.forEach(function(f){
+          if(f.value && f.value.trim()) L.push('    · '+f.getAttribute('data-sub')+':'+f.value.trim());
+        });
+      });
+
+      L.push('');
+    });
+    return L.join('\n');
+  }
+
+  /* ---------- export actions ---------- */
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+  }
+  var status = document.getElementById('exportStatus');
+
+  document.getElementById('btnCopy').addEventListener('click', function(){
+    var text = collect();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        showToast('已複製,貼上後回傳給我即可');
+        status.textContent = '✓ 內容已複製到剪貼簿';
+      }, fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+      ta.select(); try{document.execCommand('copy'); showToast('已複製');}catch(e){showToast('複製失敗,請改用下載');}
+      document.body.removeChild(ta);
+    }
+  });
+
+  document.getElementById('btnDownload').addEventListener('click', function(){
+    var text = collect();
+    var name = (document.getElementById('f-name').value.trim() || '測試組問卷');
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name + '_問卷填答.txt';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 100);
+    showToast('已開始下載');
+    status.textContent = '✓ 已下載文字檔';
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>

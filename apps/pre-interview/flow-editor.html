@@ -1,0 +1,1552 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>測試流程編輯器</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2937;
+      background: #f4f6f8;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      background: #eef2f7;
+      color: #1f2937;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #e1e7f0;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .primary:hover {
+      background: #1d4ed8;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .danger:hover {
+      background: #fecaca;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .success:hover {
+      background: #bbf7d0;
+    }
+
+    .active-warning {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+
+    .active-warning:hover {
+      background: #fdba74;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: #ffffff;
+      border-right: 1px solid #d9dee7;
+      padding: 18px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin: 20px 0 10px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cfd6e4;
+      border-radius: 8px;
+      padding: 10px 12px;
+      outline: none;
+      background: #ffffff;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .palette {
+      display: grid;
+      gap: 8px;
+    }
+
+    .palette button {
+      text-align: left;
+      border: 1px solid #cfd6e4;
+      background: #f8fafc;
+      cursor: grab;
+    }
+
+    .palette button:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .panel {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #f8fafc;
+    }
+
+    .panel-title {
+      margin: 0 0 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .panel small {
+      display: block;
+      margin-top: 8px;
+      color: #667085;
+      line-height: 1.6;
+    }
+
+    .stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 14px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid #d9dee7;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .status {
+      color: #667085;
+      font-size: 14px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      overflow: auto;
+      min-height: 0;
+      background:
+        linear-gradient(#e5e7eb 1px, transparent 1px),
+        linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .canvas {
+      position: relative;
+      width: 1800px;
+      height: 1100px;
+      min-width: 100%;
+      min-height: 100%;
+    }
+
+    .edge-layer {
+      position: absolute;
+      inset: 0;
+      width: 1800px;
+      height: 1100px;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    .edge-line {
+      pointer-events: none;
+    }
+
+    .edge-line.selected {
+      stroke: #f97316;
+      stroke-width: 4;
+    }
+
+    .edge-hit-line {
+      cursor: pointer;
+      pointer-events: stroke;
+    }
+
+    .flow-node {
+      position: absolute;
+      z-index: 2;
+      min-width: 170px;
+      max-width: 280px;
+      border: 1px solid #93c5fd;
+      border-radius: 12px;
+      background: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      user-select: none;
+    }
+
+    .flow-node.selected {
+      border-color: #2563eb;
+      box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.16),
+        0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .flow-node.connect-source {
+      border-color: #16a34a;
+      box-shadow:
+        0 0 0 4px rgba(22, 163, 74, 0.18),
+        0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 8px 4px 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid #eef2f7;
+      cursor: move;
+    }
+
+    .node-index {
+      font-size: 12px;
+      color: #667085;
+    }
+
+    .node-delete {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border-radius: 999px;
+      line-height: 1;
+      font-size: 16px;
+      background: #fee2e2;
+      color: #991b1b;
+      cursor: pointer;
+    }
+
+    .node-delete:hover {
+      background: #fecaca;
+    }
+
+    .node-body {
+      position: relative;
+      padding: 10px 38px 12px 14px;
+      cursor: pointer;
+    }
+
+    .connect-handle {
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 2px solid #ffffff;
+      background: #2563eb;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    .connect-handle:hover {
+      background: #1d4ed8;
+    }
+
+    .node-title {
+      font-weight: 700;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .node-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #667085;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .modal-mask.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(820px, calc(100vw - 32px));
+      max-height: min(760px, calc(100vh - 32px));
+      overflow: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
+    }
+
+    .modal h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .modal textarea {
+      min-height: 460px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      display: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 14px;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 920px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .sidebar {
+        max-height: 420px;
+        border-right: 0;
+        border-bottom: 1px solid #d9dee7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h1>測試流程編輯器</h1>
+      <p class="subtitle">
+        拖曳流程節點，整理測試組的現況流程、卡關點與可 AI 化節點。完成後可直接回填 Markdown 到問卷 Q1。
+      </p>
+
+      <div class="section-title">新增自訂流程</div>
+      <div class="row">
+        <input id="newNodeInput" placeholder="例如：環境確認、資料準備" />
+        <button type="button" class="primary" id="addPresetBtn">新增</button>
+      </div>
+
+      <div class="section-title">預設流程節點</div>
+      <div class="palette" id="nodePalette"></div>
+
+      <div class="section-title">選取節點 / 連線</div>
+      <div class="panel">
+        <p class="panel-title" id="selectedTitle">尚未選取節點或連線</p>
+        <div class="stack">
+          <input id="selectedLabelInput" placeholder="先點選畫布中的節點" />
+          <button type="button" class="success" id="updateNodeBtn">更新節點名稱</button>
+          <button type="button" class="danger" id="deleteNodeSideBtn">刪除選取節點</button>
+          <button type="button" class="danger" id="deleteEdgeSideBtn">刪除目前連線</button>
+        </div>
+        <small>
+          點選節點可改名或刪除；也可從節點右側藍色箭頭拖曳建立連線；點選線條後，線條會變橘色，可刪除連線。
+        </small>
+      </div>
+
+      <div class="section-title">輸出</div>
+      <div class="stack">
+        <button type="button" class="success" id="returnToQuestionnaireBtn">回填到問卷 Q1</button>
+        <button type="button" class="primary" id="downloadMdBtn">下載 Markdown</button>
+        <button type="button" id="previewMdBtn">預覽 / 複製 Markdown</button>
+      </div>
+
+      <div class="panel">
+        <p class="panel-title">操作方式</p>
+        <small>
+          1. 從左側拖節點到畫布。<br />
+          2. 點選節點，可在左側改名或刪除。<br />
+          3. 拖曳節點上方灰色區塊可移動位置。<br />
+          4. 可直接從節點右側的藍色箭頭圓點拖曳到另一個節點建立連線。<br />
+          5. 也可使用「開始連線」後依序點來源與目標節點。<br />
+          6. 點選線條，線條變橘色後，按「刪除目前連線」。
+        </small>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button type="button" id="connectModeBtn" title="點擊後依序點擊起始與目標節點">開始連線</button>
+          <button type="button" id="deleteEdgeBtn" title="刪除目前選取的連線">刪除目前連線</button>
+          <button type="button" id="deleteNodeBtn">刪除選取節點</button>
+          <button type="button" id="clearCanvasBtn">清空畫布</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" id="resetBtn">重置範例流程</button>
+          <span class="status" id="statusText">目前 0 個節點、0 條連線</span>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="canvas" id="canvas">
+          <svg class="edge-layer" id="edgeLayer">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#64748b"></path>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="modalMask">
+    <div class="modal">
+      <h2>Markdown 預覽</h2>
+      <textarea id="markdownPreview"></textarea>
+      <div class="modal-actions">
+        <button type="button" class="success" id="returnMdBtn">回填到問卷 Q1</button>
+        <button type="button" id="copyMdBtn">複製內容</button>
+        <button type="button" class="primary" id="closeModalBtn">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var defaultPresets = [
+        "需求進來",
+        "確認需求範圍",
+        "撰寫測試案例",
+        "Review 測試案例",
+        "資料準備",
+        "環境確認",
+        "執行測試",
+        "跨組支援",
+        "回報缺陷",
+        "驗證修正結果",
+        "回歸測試",
+        "測試完成"
+      ];
+
+      var presets = defaultPresets.slice();
+
+      var nodes = [
+        { id: "node-1", label: "需求進來", x: 90, y: 120 },
+        { id: "node-2", label: "撰寫測試案例", x: 310, y: 120 },
+        { id: "node-3", label: "執行測試", x: 560, y: 120 },
+        { id: "node-4", label: "回報缺陷", x: 790, y: 120 }
+      ];
+
+      var edges = [
+        { id: "edge-1", source: "node-1", target: "node-2" },
+        { id: "edge-2", source: "node-2", target: "node-3" },
+        { id: "edge-3", source: "node-3", target: "node-4" }
+      ];
+
+      var nodeSeq = 5;
+      var edgeSeq = 4;
+      var selectedNodeId = null;
+      var selectedEdgeId = null;
+      var connectSourceId = null;
+      var dragConnectionSourceId = null;
+      var tempConnectionX = 0;
+      var tempConnectionY = 0;
+      var isConnectMode = false;
+      var draggingNodeId = null;
+      var dragOffsetX = 0;
+      var dragOffsetY = 0;
+      var toastTimer = null;
+
+      var nodePalette = document.getElementById("nodePalette");
+      var newNodeInput = document.getElementById("newNodeInput");
+      var selectedTitle = document.getElementById("selectedTitle");
+      var selectedLabelInput = document.getElementById("selectedLabelInput");
+      var canvasWrap = document.getElementById("canvasWrap");
+      var canvas = document.getElementById("canvas");
+      var edgeLayer = document.getElementById("edgeLayer");
+      var connectModeBtn = document.getElementById("connectModeBtn");
+      var deleteEdgeBtn = document.getElementById("deleteEdgeBtn");
+      var deleteEdgeSideBtn = document.getElementById("deleteEdgeSideBtn");
+      var statusText = document.getElementById("statusText");
+      var modalMask = document.getElementById("modalMask");
+      var markdownPreview = document.getElementById("markdownPreview");
+      var toast = document.getElementById("toast");
+      var returnKey = getQueryParam("returnKey") || "qa_flow_markdown_return";
+
+      function init() {
+        bindStaticEvents();
+        renderPalette();
+        render();
+      }
+
+      function bindStaticEvents() {
+        document.getElementById("addPresetBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          addPreset();
+        });
+
+        document.getElementById("updateNodeBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          updateSelectedNode();
+        });
+
+        document.getElementById("deleteNodeSideBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          deleteSelectedNode();
+        });
+
+        document.getElementById("deleteNodeBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          deleteSelectedNode();
+        });
+
+        deleteEdgeBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteSelectedEdge();
+        });
+
+        deleteEdgeSideBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteSelectedEdge();
+        });
+
+        connectModeBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          toggleConnectMode();
+        });
+
+        document.getElementById("clearCanvasBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          clearCanvas();
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          resetExample();
+        });
+
+        document.getElementById("downloadMdBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          downloadMarkdown();
+        });
+
+        document.getElementById("previewMdBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          previewMarkdown();
+        });
+
+        document.getElementById("returnToQuestionnaireBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          returnToQuestionnaire();
+        });
+
+        document.getElementById("returnMdBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          markdownPreview.value = createMarkdown();
+          returnToQuestionnaire();
+        });
+
+        document.getElementById("copyMdBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          copyMarkdown();
+        });
+
+        document.getElementById("closeModalBtn").addEventListener("click", function (event) {
+          event.preventDefault();
+          closeModal();
+        });
+
+        newNodeInput.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            addPreset();
+          }
+        });
+
+        canvasWrap.addEventListener("dragover", function (event) {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+        });
+
+        canvasWrap.addEventListener("drop", function (event) {
+          event.preventDefault();
+
+          var label = event.dataTransfer.getData("application/qa-flow-node");
+          if (!label) return;
+
+          var rect = canvas.getBoundingClientRect();
+          var x = event.clientX - rect.left - 85;
+          var y = event.clientY - rect.top - 44;
+
+          addNodeToCanvas(label, Math.max(0, x), Math.max(0, y));
+        });
+
+        canvas.addEventListener("click", function (event) {
+          if (event.target === canvas || event.target === edgeLayer) {
+            selectedNodeId = null;
+            selectedEdgeId = null;
+            dragConnectionSourceId = null;
+            render();
+          }
+        });
+
+        window.addEventListener("mousemove", function (event) {
+          var rect = canvas.getBoundingClientRect();
+
+          if (dragConnectionSourceId) {
+            tempConnectionX = Math.max(0, event.clientX - rect.left);
+            tempConnectionY = Math.max(0, event.clientY - rect.top);
+            renderEdges();
+            return;
+          }
+
+          if (!draggingNodeId) return;
+
+          var node = findNode(draggingNodeId);
+          if (!node) return;
+
+          node.x = Math.max(0, event.clientX - rect.left - dragOffsetX);
+          node.y = Math.max(0, event.clientY - rect.top - dragOffsetY);
+
+          var el = document.querySelector('[data-node-id="' + draggingNodeId + '"]');
+          if (el) {
+            el.style.left = node.x + "px";
+            el.style.top = node.y + "px";
+          }
+
+          renderEdges();
+        });
+
+        window.addEventListener("mouseup", function (event) {
+          if (dragConnectionSourceId) {
+            finishDragConnection(event);
+            return;
+          }
+
+          draggingNodeId = null;
+        });
+
+        document.addEventListener("keydown", function (event) {
+          var tag = document.activeElement && document.activeElement.tagName
+            ? document.activeElement.tagName.toLowerCase()
+            : "";
+          var isTyping = tag === "input" || tag === "textarea";
+
+          if (!isTyping && (event.key === "Delete" || event.key === "Backspace")) {
+            if (selectedEdgeId) {
+              event.preventDefault();
+              deleteSelectedEdge();
+              return;
+            }
+
+            if (selectedNodeId) {
+              event.preventDefault();
+              deleteSelectedNode();
+            }
+          }
+
+          if (!isTyping && event.key === "Escape") {
+            cancelConnectMode();
+          }
+        });
+
+        modalMask.addEventListener("click", function (event) {
+          if (event.target === modalMask) {
+            closeModal();
+          }
+        });
+      }
+
+      function renderPalette() {
+        nodePalette.innerHTML = "";
+
+        for (var i = 0; i < presets.length; i++) {
+          var label = presets[i];
+          var btn = document.createElement("button");
+
+          btn.type = "button";
+          btn.draggable = true;
+          btn.textContent = label;
+          btn.setAttribute("data-preset-label", label);
+
+          btn.addEventListener("dragstart", function (event) {
+            var value = event.currentTarget.getAttribute("data-preset-label");
+            event.dataTransfer.setData("application/qa-flow-node", value);
+            event.dataTransfer.effectAllowed = "copy";
+          });
+
+          nodePalette.appendChild(btn);
+        }
+      }
+
+      function render() {
+        renderEdges();
+        renderNodes();
+        updatePanel();
+        updateStatus();
+      }
+
+      function renderNodes() {
+        var oldNodes = canvas.querySelectorAll(".flow-node");
+        for (var i = 0; i < oldNodes.length; i++) {
+          oldNodes[i].parentNode.removeChild(oldNodes[i]);
+        }
+
+        for (var j = 0; j < nodes.length; j++) {
+          var node = nodes[j];
+          var el = document.createElement("div");
+
+          el.className = "flow-node";
+          if (node.id === selectedNodeId) el.className += " selected";
+          if (node.id === connectSourceId) el.className += " connect-source";
+
+          el.style.left = node.x + "px";
+          el.style.top = node.y + "px";
+          el.setAttribute("data-node-id", node.id);
+
+          el.innerHTML =
+            '<div class="node-header">' +
+              '<span class="node-index">節點 ' + (j + 1) + '</span>' +
+              '<button type="button" class="node-delete" title="刪除此節點">×</button>' +
+            '</div>' +
+            '<div class="node-body">' +
+              '<div class="node-title">' + escapeHtml(node.label) + '</div>' +
+              '<div class="node-meta">點選可選取；拖曳上方可移動</div>' +
+              '<div class="connect-handle" title="拖曳建立箭頭連線">→</div>' +
+            '</div>';
+
+          bindNodeEvents(el, node.id);
+          canvas.appendChild(el);
+        }
+      }
+
+      function bindNodeEvents(el, nodeId) {
+        var header = el.querySelector(".node-header");
+        var deleteBtn = el.querySelector(".node-delete");
+        var connectHandle = el.querySelector(".connect-handle");
+
+        el.addEventListener("click", function (event) {
+          event.stopPropagation();
+          selectOrConnectNode(nodeId);
+        });
+
+        el.addEventListener("dblclick", function (event) {
+          event.stopPropagation();
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+          updatePanel();
+          selectedLabelInput.focus();
+          selectedLabelInput.select();
+        });
+
+        header.addEventListener("mousedown", function (event) {
+          if (event.button !== 0) return;
+          if (event.target === deleteBtn) return;
+
+          event.stopPropagation();
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+
+          if (isConnectMode) {
+            selectOrConnectNode(nodeId);
+            return;
+          }
+
+          draggingNodeId = nodeId;
+
+          var rect = el.getBoundingClientRect();
+          dragOffsetX = event.clientX - rect.left;
+          dragOffsetY = event.clientY - rect.top;
+
+          render();
+        });
+
+        deleteBtn.addEventListener("mousedown", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+
+        deleteBtn.addEventListener("mouseup", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+
+        deleteBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteNodeById(nodeId);
+        });
+
+        connectHandle.addEventListener("mousedown", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          draggingNodeId = null;
+          dragConnectionSourceId = nodeId;
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+
+          var rect = canvas.getBoundingClientRect();
+          tempConnectionX = Math.max(0, event.clientX - rect.left);
+          tempConnectionY = Math.max(0, event.clientY - rect.top);
+
+          render();
+          showToast("拖曳箭頭到另一個節點建立連線");
+        });
+
+        connectHandle.addEventListener("mouseup", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+      }
+
+      function renderEdges() {
+        var oldLines = edgeLayer.querySelectorAll(".edge-line, .edge-hit-line, .edge-preview");
+        for (var i = 0; i < oldLines.length; i++) {
+          oldLines[i].parentNode.removeChild(oldLines[i]);
+        }
+
+        for (var j = 0; j < edges.length; j++) {
+          var edge = edges[j];
+          var source = findNode(edge.source);
+          var target = findNode(edge.target);
+
+          if (!source || !target) continue;
+
+          var sourcePoint = getNodeOutputPoint(source);
+          var targetPoint = getNodeInputPoint(target);
+
+          var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("class", edge.id === selectedEdgeId ? "edge-line selected" : "edge-line");
+          line.setAttribute("x1", sourcePoint.x);
+          line.setAttribute("y1", sourcePoint.y);
+          line.setAttribute("x2", targetPoint.x);
+          line.setAttribute("y2", targetPoint.y);
+          line.setAttribute("stroke", edge.id === selectedEdgeId ? "#f97316" : "#64748b");
+          line.setAttribute("stroke-width", edge.id === selectedEdgeId ? "4" : "2");
+          line.setAttribute("marker-end", "url(#arrow)");
+
+          var hitLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          hitLine.setAttribute("class", "edge-hit-line");
+          hitLine.setAttribute("x1", sourcePoint.x);
+          hitLine.setAttribute("y1", sourcePoint.y);
+          hitLine.setAttribute("x2", targetPoint.x);
+          hitLine.setAttribute("y2", targetPoint.y);
+          hitLine.setAttribute("stroke", "transparent");
+          hitLine.setAttribute("stroke-width", "28");
+          hitLine.setAttribute("data-edge-id", edge.id);
+
+          hitLine.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            selectEdge(event.currentTarget.getAttribute("data-edge-id"));
+          });
+
+          edgeLayer.appendChild(line);
+          edgeLayer.appendChild(hitLine);
+        }
+
+        if (dragConnectionSourceId) {
+          var sourceNode = findNode(dragConnectionSourceId);
+          if (sourceNode) {
+            var previewStart = getNodeOutputPoint(sourceNode);
+            var preview = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            preview.setAttribute("class", "edge-preview");
+            preview.setAttribute("x1", previewStart.x);
+            preview.setAttribute("y1", previewStart.y);
+            preview.setAttribute("x2", tempConnectionX);
+            preview.setAttribute("y2", tempConnectionY);
+            preview.setAttribute("stroke", "#2563eb");
+            preview.setAttribute("stroke-width", "3");
+            preview.setAttribute("stroke-dasharray", "6 4");
+            preview.setAttribute("marker-end", "url(#arrow)");
+            edgeLayer.appendChild(preview);
+          }
+        }
+      }
+
+      function getNodeInputPoint(node) {
+        return {
+          x: node.x,
+          y: node.y + 44
+        };
+      }
+
+      function getNodeOutputPoint(node) {
+        return {
+          x: node.x + 170,
+          y: node.y + 44
+        };
+      }
+
+      function addPreset() {
+        var label = trim(newNodeInput.value);
+        if (!label) {
+          showToast("請先輸入流程名稱");
+          return;
+        }
+
+        if (presets.indexOf(label) === -1) {
+          presets.push(label);
+          renderPalette();
+          showToast("已新增預設流程：" + label);
+        } else {
+          showToast("此流程已存在");
+        }
+
+        newNodeInput.value = "";
+      }
+
+      function addNodeToCanvas(label, x, y) {
+        var node = {
+          id: "node-" + nodeSeq++,
+          label: label,
+          x: x,
+          y: y
+        };
+
+        nodes.push(node);
+        selectedNodeId = node.id;
+        selectedEdgeId = null;
+        render();
+      }
+
+      function selectOrConnectNode(nodeId) {
+        if (!isConnectMode) {
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+          render();
+          return;
+        }
+
+        if (!connectSourceId) {
+          connectSourceId = nodeId;
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+          render();
+          return;
+        }
+
+        if (connectSourceId === nodeId) {
+          connectSourceId = null;
+          selectedNodeId = nodeId;
+          selectedEdgeId = null;
+          render();
+          return;
+        }
+
+        if (!edgeExists(connectSourceId, nodeId)) {
+          edges.push({
+            id: "edge-" + edgeSeq++,
+            source: connectSourceId,
+            target: nodeId
+          });
+          showToast("已建立連線");
+        } else {
+          showToast("這兩個節點已經有連線");
+        }
+
+        selectedNodeId = nodeId;
+        selectedEdgeId = null;
+        cancelConnectMode(false);
+        render();
+      }
+
+      function toggleConnectMode() {
+        isConnectMode = !isConnectMode;
+        connectSourceId = null;
+        selectedEdgeId = null;
+
+        if (isConnectMode) {
+          connectModeBtn.textContent = "取消連線";
+          connectModeBtn.className = "primary";
+          showToast("請點選來源節點");
+        } else {
+          connectModeBtn.textContent = "開始連線";
+          connectModeBtn.className = "";
+        }
+
+        render();
+      }
+
+      function cancelConnectMode(shouldRender) {
+        isConnectMode = false;
+        connectSourceId = null;
+        connectModeBtn.textContent = "開始連線";
+        connectModeBtn.className = "";
+
+        if (shouldRender !== false) {
+          render();
+        }
+      }
+
+      function finishDragConnection(event) {
+        var sourceId = dragConnectionSourceId;
+        dragConnectionSourceId = null;
+
+        var targetElement = event && event.target && event.target.closest
+          ? event.target.closest(".flow-node")
+          : null;
+
+        if (targetElement) {
+          var targetId = targetElement.getAttribute("data-node-id");
+
+          if (sourceId && targetId && sourceId !== targetId) {
+            if (!edgeExists(sourceId, targetId)) {
+              edges.push({
+                id: "edge-" + edgeSeq++,
+                source: sourceId,
+                target: targetId
+              });
+              selectedNodeId = targetId;
+              selectedEdgeId = null;
+              showToast("已建立箭頭連線");
+            } else {
+              showToast("這兩個節點已經有連線");
+            }
+          }
+        }
+
+        render();
+      }
+
+      function selectEdge(edgeId) {
+        var edge = findEdge(edgeId);
+        if (!edge) return;
+
+        selectedEdgeId = edgeId;
+        selectedNodeId = null;
+        connectSourceId = null;
+        cancelConnectMode(false);
+        render();
+        showToast("已選取連線，可按「刪除目前連線」");
+      }
+
+      function deleteSelectedEdge() {
+        if (!selectedEdgeId) {
+          showToast("請先點選一條連線");
+          return;
+        }
+
+        deleteEdgeById(selectedEdgeId);
+      }
+
+      function deleteEdgeById(edgeId) {
+        var edge = findEdge(edgeId);
+        if (!edge) {
+          showToast("找不到連線");
+          return;
+        }
+
+        var source = findNode(edge.source);
+        var target = findNode(edge.target);
+
+        var nextEdges = [];
+        for (var i = 0; i < edges.length; i++) {
+          if (edges[i].id !== edgeId) nextEdges.push(edges[i]);
+        }
+
+        edges = nextEdges;
+        selectedEdgeId = null;
+
+        render();
+        showToast("已刪除連線：" + (source ? source.label : "來源") + " → " + (target ? target.label : "目標"));
+      }
+
+      function updateSelectedNode() {
+        var node = findNode(selectedNodeId);
+        if (!node) {
+          showToast("請先選取一個節點");
+          return;
+        }
+
+        var nextLabel = trim(selectedLabelInput.value);
+        if (!nextLabel) {
+          showToast("節點名稱不可空白");
+          return;
+        }
+
+        node.label = nextLabel;
+        render();
+        showToast("已更新節點名稱");
+      }
+
+      function deleteSelectedNode() {
+        if (!selectedNodeId) {
+          showToast("請先選取一個節點");
+          return;
+        }
+
+        deleteNodeById(selectedNodeId);
+      }
+
+      function deleteNodeById(nodeId) {
+        var node = findNode(nodeId);
+        if (!node) {
+          showToast("找不到節點");
+          return;
+        }
+
+        var nextNodes = [];
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].id !== nodeId) nextNodes.push(nodes[i]);
+        }
+
+        var nextEdges = [];
+        for (var j = 0; j < edges.length; j++) {
+          if (edges[j].source !== nodeId && edges[j].target !== nodeId) {
+            nextEdges.push(edges[j]);
+          }
+        }
+
+        nodes = nextNodes;
+        edges = nextEdges;
+
+        if (selectedNodeId === nodeId) selectedNodeId = null;
+        if (connectSourceId === nodeId) connectSourceId = null;
+        if (selectedEdgeId && !findEdgeInList(selectedEdgeId, edges)) selectedEdgeId = null;
+        draggingNodeId = null;
+        if (dragConnectionSourceId === nodeId) dragConnectionSourceId = null;
+
+        render();
+        showToast("已刪除節點：" + node.label);
+      }
+
+      function clearCanvas() {
+        nodes = [];
+        edges = [];
+        selectedNodeId = null;
+        selectedEdgeId = null;
+        connectSourceId = null;
+        dragConnectionSourceId = null;
+        draggingNodeId = null;
+        cancelConnectMode(false);
+        render();
+        showToast("已清空畫布");
+      }
+
+      function resetExample() {
+        nodes = [
+          { id: "node-1", label: "需求進來", x: 90, y: 120 },
+          { id: "node-2", label: "撰寫測試案例", x: 310, y: 120 },
+          { id: "node-3", label: "執行測試", x: 560, y: 120 },
+          { id: "node-4", label: "回報缺陷", x: 790, y: 120 }
+        ];
+
+        edges = [
+          { id: "edge-1", source: "node-1", target: "node-2" },
+          { id: "edge-2", source: "node-2", target: "node-3" },
+          { id: "edge-3", source: "node-3", target: "node-4" }
+        ];
+
+        nodeSeq = 5;
+        edgeSeq = 4;
+        selectedNodeId = null;
+        selectedEdgeId = null;
+        connectSourceId = null;
+        dragConnectionSourceId = null;
+        draggingNodeId = null;
+        cancelConnectMode(false);
+        render();
+        showToast("已重置範例流程");
+      }
+
+      function updatePanel() {
+        var edge = findEdge(selectedEdgeId);
+
+        if (edge) {
+          var source = findNode(edge.source);
+          var target = findNode(edge.target);
+          selectedTitle.textContent = "目前選取連線：" + (source ? source.label : "來源") + " → " + (target ? target.label : "目標");
+          selectedLabelInput.value = "";
+          selectedLabelInput.placeholder = "目前選取的是連線，可按「刪除目前連線」";
+          return;
+        }
+
+        var node = findNode(selectedNodeId);
+
+        if (!node) {
+          selectedTitle.textContent = "尚未選取節點或連線";
+          selectedLabelInput.value = "";
+          selectedLabelInput.placeholder = "先點選畫布中的節點";
+          return;
+        }
+
+        selectedTitle.textContent = "目前選取：" + node.label;
+        selectedLabelInput.value = node.label;
+      }
+
+      function updateStatus() {
+        if (isConnectMode && connectSourceId) {
+          var source = findNode(connectSourceId);
+          statusText.textContent = "來源：" + (source ? source.label : "未知") + "，請點選目標節點";
+          return;
+        }
+
+        if (isConnectMode) {
+          statusText.textContent = "請點選來源節點";
+          return;
+        }
+
+        var selectedEdge = findEdge(selectedEdgeId);
+        if (selectedEdge) {
+          var edgeSource = findNode(selectedEdge.source);
+          var edgeTarget = findNode(selectedEdge.target);
+          statusText.textContent = "已選取連線：" + (edgeSource ? edgeSource.label : "來源") + " → " + (edgeTarget ? edgeTarget.label : "目標");
+          return;
+        }
+
+        var selected = findNode(selectedNodeId);
+        if (selected) {
+          statusText.textContent = "已選取：" + selected.label;
+          return;
+        }
+
+        statusText.textContent = "目前 " + nodes.length + " 個節點、" + edges.length + " 條連線";
+      }
+
+      function createMarkdown() {
+        var sortedNodes = nodes.slice().sort(function (a, b) {
+          if (a.y === b.y) return a.x - b.x;
+          return a.y - b.y;
+        });
+
+        var nodeIdMap = {};
+        for (var i = 0; i < sortedNodes.length; i++) {
+          nodeIdMap[sortedNodes[i].id] = "N" + (i + 1);
+        }
+
+        var lines = [];
+
+        lines.push("# 測試流程圖");
+        lines.push("");
+        lines.push("## 流程圖");
+        lines.push("");
+        lines.push("```mermaid");
+        lines.push("flowchart LR");
+
+        for (var j = 0; j < sortedNodes.length; j++) {
+          var node = sortedNodes[j];
+          lines.push("  " + nodeIdMap[node.id] + '["' + escapeMermaid(node.label) + '"]');
+        }
+
+        for (var k = 0; k < edges.length; k++) {
+          var edge = edges[k];
+          var source = nodeIdMap[edge.source];
+          var target = nodeIdMap[edge.target];
+          if (source && target) {
+            lines.push("  " + source + " --> " + target);
+          }
+        }
+
+        lines.push("```");
+        lines.push("");
+        lines.push("## 流程節點");
+        lines.push("");
+        lines.push("| 編號 | 節點名稱 | X | Y |");
+        lines.push("|---|---|---:|---:|");
+
+        for (var a = 0; a < sortedNodes.length; a++) {
+          var n = sortedNodes[a];
+          lines.push("| " + nodeIdMap[n.id] + " | " + escapeMarkdownTable(n.label) + " | " + Math.round(n.x) + " | " + Math.round(n.y) + " |");
+        }
+
+        lines.push("");
+        lines.push("## 流程連線");
+        lines.push("");
+        lines.push("| 來源節點 | 目標節點 |");
+        lines.push("|---|---|");
+
+        if (edges.length === 0) {
+          lines.push("| 尚未建立 | 尚未建立 |");
+        } else {
+          for (var b = 0; b < edges.length; b++) {
+            var e = edges[b];
+            if (nodeIdMap[e.source] && nodeIdMap[e.target]) {
+              lines.push("| " + nodeIdMap[e.source] + " | " + nodeIdMap[e.target] + " |");
+            }
+          }
+        }
+
+        lines.push("");
+        lines.push("## 流程盤點建議");
+        lines.push("");
+        lines.push("| 節點 | 是否耗時 | 是否需跨組支援 | 是否可導入 AI | 備註 |");
+        lines.push("|---|---|---|---|---|");
+
+        for (var c = 0; c < sortedNodes.length; c++) {
+          lines.push("| " + escapeMarkdownTable(sortedNodes[c].label) + " |  |  |  |  |");
+        }
+
+        lines.push("");
+        lines.push("## 後續分析方向");
+        lines.push("");
+        lines.push("- 哪些節點最常造成新需求測試排程延遲？");
+        lines.push("- 哪些節點高度依賴人工執行？");
+        lines.push("- 哪些節點需要其他組支援？");
+        lines.push("- 哪些節點可以先用 AI 協助產出、檢查或彙整？");
+        lines.push("");
+
+        return lines.join("\n");
+      }
+
+      function returnToQuestionnaire() {
+        var markdown = createMarkdown();
+
+        try {
+          localStorage.setItem(returnKey, markdown);
+        } catch (error) {}
+
+        if (window.opener && !window.opener.closed) {
+          try {
+            window.opener.postMessage({
+              type: "QA_FLOW_MD",
+              md: markdown,
+              returnKey: returnKey
+            }, "*");
+            window.opener.focus();
+            showToast("已回填到問卷，請回問卷分頁確認 Q1");
+            return;
+          } catch (error) {
+            // 若瀏覽器不允許跨分頁通訊，仍保留 localStorage 暫存與手動複製。
+          }
+        }
+
+        showToast("已暫存 Markdown；若問卷未自動更新，請複製後貼回 Q1");
+      }
+
+      function downloadMarkdown() {
+        var markdown = createMarkdown();
+        var blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        var today = new Date().toISOString().slice(0, 10);
+
+        link.href = url;
+        link.download = "qa-flow-sketch-" + today + ".md";
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast("已下載 Markdown");
+      }
+
+      function previewMarkdown() {
+        markdownPreview.value = createMarkdown();
+        modalMask.className = "modal-mask open";
+      }
+
+      function closeModal() {
+        modalMask.className = "modal-mask";
+      }
+
+      function copyMarkdown() {
+        markdownPreview.focus();
+        markdownPreview.select();
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(markdownPreview.value).then(function () {
+            showToast("已複製 Markdown");
+          }).catch(function () {
+            document.execCommand("copy");
+            showToast("已複製 Markdown");
+          });
+        } else {
+          document.execCommand("copy");
+          showToast("已複製 Markdown");
+        }
+      }
+
+      function getQueryParam(name) {
+        var query = window.location.search || "";
+        if (!query) return "";
+
+        var parts = query.replace(/^\?/, "").split("&");
+        for (var i = 0; i < parts.length; i++) {
+          var pair = parts[i].split("=");
+          if (decodeURIComponent(pair[0] || "") === name) {
+            return decodeURIComponent((pair[1] || "").replace(/\+/g, " "));
+          }
+        }
+
+        return "";
+      }
+
+      function findNode(nodeId) {
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].id === nodeId) return nodes[i];
+        }
+        return null;
+      }
+
+      function findEdge(edgeId) {
+        return findEdgeInList(edgeId, edges);
+      }
+
+      function findEdgeInList(edgeId, edgeList) {
+        if (!edgeId) return null;
+
+        for (var i = 0; i < edgeList.length; i++) {
+          if (edgeList[i].id === edgeId) return edgeList[i];
+        }
+
+        return null;
+      }
+
+      function edgeExists(source, target) {
+        for (var i = 0; i < edges.length; i++) {
+          if (edges[i].source === source && edges[i].target === target) return true;
+        }
+        return false;
+      }
+
+      function trim(text) {
+        return String(text || "").replace(/^\s+|\s+$/g, "");
+      }
+
+      function escapeHtml(text) {
+        return String(text)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function escapeMermaid(text) {
+        return String(text)
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, " ");
+      }
+
+      function escapeMarkdownTable(text) {
+        return String(text)
+          .replace(/\|/g, "\\|")
+          .replace(/\n/g, "<br />");
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.className = "toast show";
+
+        if (toastTimer) {
+          clearTimeout(toastTimer);
+        }
+
+        toastTimer = setTimeout(function () {
+          toast.className = "toast";
+        }, 1800);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

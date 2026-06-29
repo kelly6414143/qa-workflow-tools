@@ -1,0 +1,13 @@
+{
+  "name": "pre-interview",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @pre-interview/tool dev",
+    "build": "pnpm --filter @pre-interview/tool build",
+    "preview": "pnpm --filter @pre-interview/tool preview"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "packageManager": "pnpm@latest"j
+}
