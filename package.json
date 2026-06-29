@@ -1,13 +1,12 @@
 {
-  "name": "pre-interview",
+  "name": "qa-workflow-tools",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @pre-interview/tool dev",
-    "build": "pnpm --filter @pre-interview/tool build",
-    "preview": "pnpm --filter @pre-interview/tool preview"
+    "dev": "pnpm --filter @qa-workflow/pre-interview dev",
+    "deploy:pages": "gh-pages -d apps/pre-interview"
   },
   "devDependencies": {
-    "turbo": "latest"
+    "gh-pages": "latest"
   },
-  "packageManager": "pnpm@latest"j
+  "packageManager": "pnpm@10.32.0"
 }
