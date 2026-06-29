@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>測試組現況問卷</title>
-<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="icon" type="image/svg+xml" href="assests/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -371,7 +371,7 @@
       <p class="q-hint">請開啟流程圖編輯器，在新分頁完成流程圖後，按「回填到問卷」。系統會把流程圖整理成 Markdown 格式帶回本題。</p>
       <div class="flow-return-card">
         <div class="flow-return-main">
-          <a class="btn-add btn-link" id="openFlowEditor" href="./flow-editor.html?returnKey=qa_flow_markdown_return" target="_blank" rel="opener">開啟流程圖編輯器</a>
+          <a class="btn-add btn-link" id="openFlowEditor" href="src/flow-editor.html?returnKey=qa_flow_markdown_return" target="_blank" rel="opener">開啟流程圖編輯器</a>
           <button type="button" class="btn-add btn-muted" id="clearFlowMd">清空回填內容</button>
         </div>
         <div class="flow-return-status" id="flowReturnStatus">尚未回填流程圖 Markdown</div>
@@ -726,7 +726,7 @@
     }
 
     function flowEditorUrl(){
-      return './flow-editor.html?returnKey=' + encodeURIComponent(FLOW_RETURN_KEY);
+      return './src/flow-editor.html?returnKey=' + encodeURIComponent(FLOW_RETURN_KEY);
     }
 
     if(openFlowEditorBtn){

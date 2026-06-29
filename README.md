@@ -12,7 +12,7 @@ Prompt 模板
 ### 檔案
 
 - `apps/pre-interview-tool/index.html`：給測試人員填寫的問卷。
-- `apps/pre-interview-tool/flow-editor.html`：測試流程圖編輯器，參考 v11 版本並加入問卷回填功能。
+- `apps/pre-interview-tool/src/flow-editor.html`：測試流程圖編輯器，參考 v11 版本並加入問卷回填功能。
 
 ### 使用方式
 
