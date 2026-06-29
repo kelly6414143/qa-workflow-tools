@@ -135,6 +135,25 @@
   .q-num{font-family:var(--mono);color:var(--accent-ink);font-weight:600;margin-right:6px;font-size:14px;}
   .q-hint{font-size:13px;color:var(--ink-faint);margin:0 0 12px;}
 
+  /* collapsible example block */
+  .eg{margin:0 0 12px;}
+  .eg summary{
+    font-family:var(--mono);font-size:12.5px;color:var(--accent);cursor:pointer;
+    list-style:none;display:inline-flex;align-items:center;gap:6px;user-select:none;
+    padding:3px 0;
+  }
+  .eg summary::-webkit-details-marker{display:none;}
+  .eg summary::before{content:"▸";display:inline-block;transition:transform .15s;}
+  .eg[open] summary::before{transform:rotate(90deg);}
+  .eg summary:hover{color:var(--accent-ink);}
+  .eg-body{
+    margin-top:8px;padding:13px 15px;background:var(--accent-soft);
+    border-radius:8px;font-size:13.5px;color:var(--accent-ink);line-height:1.65;
+  }
+  .eg-body p{margin:0 0 7px;color:var(--ink-soft);font-size:12.5px;}
+  .eg-body ul{margin:0;padding-left:18px;}
+  .eg-body li{margin:4px 0;}
+
   /* ---------- inputs ---------- */
   input[type=text], textarea, .pct-input{
     width:100%;font-family:var(--body);font-size:15px;color:var(--ink);
@@ -378,28 +397,22 @@
       </div>
     </div>
 
-    <div class="q" data-track data-q="Q3 案例的測試耗時">
-      <span class="q-label"><span class="q-num">Q3</span>請以你「最近做過、有印象的一個需求」為例,填寫以下幾欄。
-    （用真實案例比估平均更準,挑一個有印象的就好)</span>
-      <div class="m-y-10">
-        <label class="m-b-4">這個需求大致是什麼</label>
-        <input type="text" data-sub="測試耗時_需求內容" placeholder="例如:會員登入改版">
-      </div>
-      <div class="m-y-10">
-        <label class="m-b-4">涉及幾個畫面 / 流程</label>
-        <input type="text" data-sub="測試耗時_畫面/流程" placeholder="例如:約 3 個畫面">
-      </div>
-      <div class="m-y-10">
-        <label class="m-b-4">大約衍生多少測試案例</label>
-        <input type="text" data-sub="測試耗時_測試案例數量" placeholder="例如:約 20~30 條">
-      </div>
-      <div class="m-y-10">
-        <label class="m-b-4">從頭到尾測了多久</label>
-        <input type="text" data-sub="測試耗時_執行測試時間" placeholder="例如:約 3 個工作天">
-      </div>
-      <div class="m-y-10">
-        <label class="m-b-4">這次有需要其他組支援嗎</label>
-        <input type="text" data-sub="測試耗時_別組支援" placeholder="例如:無 / 有,轉站找 OO 組">
+    <div class="q" data-track data-q="Q3 最近一個需求的規模與耗時">
+      <span class="q-label"><span class="q-num">Q3</span>請以你「最近做過、有印象的一個需求」為例</span>
+      <p class="q-hint">用真實案例比估平均更準。下面幾欄幫我同時抓到它的規模與實際耗時。</p>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <p>挑一個近期、有印象的需求,像這樣描述就很好用:</p>
+        <ul>
+          <li>需求:會員登入改版 ｜ 涉及:約 3 個畫面 ｜ 案例數:約 25 條 ｜ 耗時:約 2 個工作天 ｜ 跨組:無</li>
+          <li>需求:訂單匯出功能 ｜ 涉及:1 個畫面 + 後端串接 ｜ 案例數:約 15 條 ｜ 耗時:約 1.5 天 ｜ 跨組:有,API 規格找開發組確認</li>
+        </ul>
+      </div></details>
+      <div class="field-row">
+        <div><span class="sub-label">這個需求大致是什麼</span><input type="text" data-sub="需求簡述" placeholder="例如:會員登入改版"></div>
+        <div><span class="sub-label">涉及幾個畫面 / 流程</span><input type="text" data-sub="畫面或流程數" placeholder="例如:約 3 個畫面"></div>
+        <div><span class="sub-label">大約衍生多少測試案例</span><input type="text" data-sub="測試案例數" placeholder="例如:約 20~30 條"></div>
+        <div><span class="sub-label">從頭到尾測了多久</span><input type="text" data-sub="實際耗時" placeholder="例如:約 3 個工作天"></div>
+        <div><span class="sub-label">這次有需要其他組支援嗎</span><input type="text" data-sub="是否跨組" placeholder="例如:無 / 有,轉站找 OO 組"></div>
       </div>
     </div>
 
@@ -423,6 +436,20 @@
         <label class="opt"><input type="radio" name="regress" value="沒有">沒有</label>
         <label class="opt"><input type="radio" name="regress" value="不確定">不確定</label>
       </div>
+      <div style="margin-top:12px">
+        <span class="sub-label">若選「沒有」,是因為?</span>
+        <div class="opts inline" data-name="regress_why">
+          <label class="opt"><input type="radio" name="regress_why" value="真的不需要">真的不需要</label>
+          <label class="opt"><input type="radio" name="regress_why" value="想做但沒時間 / 人力">想做但沒時間 / 人力</label>
+          <label class="opt" data-other><input type="radio" name="regress_why" value="其他">其他<input type="text" class="free" placeholder="請說明"></label>
+        </div>
+      </div>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「有,每次發版前要把核心流程重測一遍,手動跑一輪約半天」</li>
+          <li>「沒有——其實該做,但人力只夠測新功能,舊功能幾乎沒空回測」</li>
+        </ul>
+      </div></details>
       <div class="grid-2" style="margin-top:12px">
         <div><span class="sub-label">若有,手動跑一輪大約多久</span><input type="text" data-sub="回歸一輪耗時" placeholder=""></div>
         <div><span class="sub-label">這類重複測試大約佔你工作</span><input type="text" data-sub="重複測試佔比" placeholder="例如:約 20%"></div>
@@ -441,6 +468,14 @@
 
     <div class="q" data-track data-q="Q6 寫測試案例的依據">
       <span class="q-label"><span class="q-num">Q6</span>你寫測試案例時,主要依據什麼?(可複選)</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <p>勾選之外,若想補充細節可寫在「其他」:</p>
+        <ul>
+          <li>「主要靠 PM 的需求文件,但常只有大概方向,細節要自己問」</li>
+          <li>「靠之前類似功能的測試案例改一改,沒有固定範本」</li>
+          <li>「靠開發口頭講解 + Slack 訊息片段拼湊」</li>
+        </ul>
+      </div></details>
       <div class="opts" data-name="basis">
         <label class="opt"><input type="checkbox" value="UI 原型 / 設計稿">UI 原型 / 設計稿</label>
         <label class="opt"><input type="checkbox" value="書面功能規格 / 需求文件">書面功能規格 / 需求文件</label>
@@ -452,6 +487,13 @@
 
     <div class="q" data-track data-q="Q7 確認需求細節的成本">
       <span class="q-label"><span class="q-num">Q7</span>如果拿到的資料不夠清楚,寫案例前要花多少時間確認需求細節?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「平均要來回問 PM 2~3 次,每次等回覆要半天到一天」</li>
+          <li>「需求不清楚時要直接找 PM 開會確認,約 30 分鐘」</li>
+          <li>「幾乎每個新需求都要額外確認,沒確認過不敢直接寫測項」</li>
+        </ul>
+      </div></details>
       <div class="field-row">
         <div><span class="sub-label">大約耗時</span><input type="text" data-sub="確認耗時" placeholder=""></div>
         <div><span class="sub-label">通常要找誰確認</span><input type="text" data-sub="找誰確認" placeholder=""></div>
@@ -461,6 +503,13 @@
 
     <div class="q" data-track data-q="Q8 需求理解錯誤導致重測">
       <span class="q-label"><span class="q-num">Q8</span>有沒有「測完才發現需求理解錯,要重測」的情況?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「有,大概每 5 個需求會有 1 個因理解錯誤要重寫測項或重測」</li>
+          <li>「偶爾發生,通常是需求沒寫清楚邊界條件(極端值、例外情境)」</li>
+          <li>「沒特別統計,但確實會發生,會影響測試進度」</li>
+        </ul>
+      </div></details>
       <div class="opts inline" data-name="rework">
         <label class="opt"><input type="radio" name="rework" value="經常">經常</label>
         <label class="opt"><input type="radio" name="rework" value="偶爾">偶爾</label>
@@ -482,21 +531,43 @@
 
     <div class="q" data-track data-q="Q9 需要其他組支援的情境">
       <span class="q-label"><span class="q-num">Q9</span>哪些測試情境需要其他組支援?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「轉站測試時,需要 OO 組協助設定測試環境或資料庫切換」</li>
+          <li>「遇到 API 串接問題,要找開發組確認介接規格」</li>
+          <li>「測試環境出問題(部署失敗、版本不一致)時,需要維運組支援」</li>
+        </ul>
+      </div></details>
       <textarea data-sub="跨組情境" placeholder=""></textarea>
     </div>
 
     <div class="q" data-track data-q="Q10 為什麼要其他組做">
-      <span class="q-label"><span class="q-num">Q10</span>為什麼這些一定要其他組做?(可複選)</span>
+      <span class="q-label"><span class="q-num">Q10</span>為什麼這些一定要其他組做?(可複選,也可直接用文字說明)</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「因為我們沒有那個環境的存取權限」</li>
+          <li>「因為那是他們組維護的系統,我們不熟悉操作方式」</li>
+          <li>「因為轉站涉及跨系統設定,只有他們組知道怎麼切換」</li>
+        </ul>
+      </div></details>
       <div class="opts" data-name="dep">
         <label class="opt"><input type="checkbox" value="只有他們有權限">只有他們有權限</label>
         <label class="opt"><input type="checkbox" value="需要他們才有的環境 / 工具">需要他們才有的環境 / 工具</label>
         <label class="opt"><input type="checkbox" value="只有他們懂相關知識">只有他們懂相關知識</label>
         <label class="opt"><input type="checkbox" value="其他" data-other>其他<input type="text" class="free" placeholder="請說明"></label>
       </div>
+      <div style="margin-top:12px"><span class="sub-label">想多說明的話(選填)</span><textarea data-sub="跨組原因補充" placeholder=""></textarea></div>
     </div>
 
     <div class="q" data-track data-q="Q11 跨組支援頻率與等待">
       <span class="q-label"><span class="q-num">Q11</span>這類跨組支援多常發生?平均要等多久才有人協助?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「平均每週 1~2 次,等待從半天到 2 天,看對方組忙不忙」</li>
+          <li>「轉站幾乎每次都要,等待大約 1 天」</li>
+          <li>「不固定,但遇到常會卡住整個排程,要排隊等對方有空」</li>
+        </ul>
+      </div></details>
       <div class="grid-2">
         <div><span class="sub-label">頻率</span><input type="text" data-sub="頻率" placeholder="例如:一個月 2~3 次"></div>
         <div><span class="sub-label">等待時間</span><input type="text" data-sub="等待時間" placeholder=""></div>
@@ -510,20 +581,36 @@
       <span class="sec-num">06</span>
       <div>
         <h2 class="sec-title">過去自動化的經驗</h2>
+        <p class="sec-sub">若你不清楚這段歷史,跳過也沒關係</p>
       </div>
     </div>
 
     <div class="q" data-track data-q="Q12 是否參與過自動化導入">
       <span class="q-label"><span class="q-num">Q12</span>你有參與過過去的自動化測試導入嗎?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「有參與,但只是聽推動的人介紹,沒自己動手寫」</li>
+          <li>「沒直接參與,但知道組內有人在嘗試」</li>
+          <li>「參與一小段,後來手上測試任務太多就沒繼續」</li>
+        </ul>
+      </div></details>
       <div class="opts inline" data-name="autoexp">
         <label class="opt"><input type="radio" name="autoexp" value="有參與">有參與</label>
         <label class="opt"><input type="radio" name="autoexp" value="知道但沒參與">知道但沒參與</label>
         <label class="opt"><input type="radio" name="autoexp" value="不清楚這件事">不清楚這件事</label>
       </div>
+      <div style="margin-top:12px"><span class="sub-label">想補充的話(選填)</span><textarea data-sub="自動化參與補充" placeholder=""></textarea></div>
     </div>
 
     <div class="q" data-track data-q="Q13 過去工具與現況">
       <span class="q-label"><span class="q-num">Q13</span>(若知情)過去用什麼工具?那些成果現在還在用嗎?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「聽說用 Selenium 寫過一些腳本,後來沒人維護就停掉了」</li>
+          <li>「不清楚用過什麼工具,只知道最後沒持續使用」</li>
+          <li>「目前完全沒在用任何自動化工具,都是純人工執行」</li>
+        </ul>
+      </div></details>
       <div style="margin-bottom:12px"><span class="sub-label">工具</span><input type="text" data-sub="工具" placeholder=""></div>
       <div class="opts inline" data-name="autostatus">
         <label class="opt"><input type="radio" name="autostatus" value="還在用">還在用</label>
@@ -536,6 +623,14 @@
     <div class="q" data-track data-q="Q14 自動化未落地的關鍵原因">
       <span class="q-label"><span class="q-num">Q14</span>你覺得當時自動化「沒有全面落地」,最關鍵的原因是什麼?</span>
       <p class="q-hint">這題很重要,請憑你的真實觀察寫,沒有標準答案。</p>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「只有一個人在推,他自己測試任務也很重,沒時間持續維護腳本」</li>
+          <li>「寫腳本學習成本高,其他人沒時間學,也沒人帶」</li>
+          <li>「測試案例常隨需求變動,腳本維護跟不上更新,後來就放棄」</li>
+          <li>「公司沒特別排時間做自動化,都要擠在正常測試工作之外」</li>
+        </ul>
+      </div></details>
       <textarea data-sub="未落地原因" placeholder="" style="min-height:110px"></textarea>
     </div>
   </section>
@@ -552,11 +647,27 @@
 
     <div class="q" data-track data-q="Q15 最希望工具幫你做的事">
       <span class="q-label"><span class="q-num">Q15</span>如果有一個工具能幫你做掉某一件事,你最希望它幫你做什麼?</span>
+      <p class="q-hint">用情境想:那個最煩、最浪費時間的步驟,你希望它幫你省掉哪一段?</p>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「根據需求文件自動產出測試案例草稿,我只要修改補充,不用從零寫」</li>
+          <li>「自動整理需求裡模糊的地方,提示我該去跟 PM 確認哪些細節」</li>
+          <li>「轉站時環境設定能自動處理,不用每次找其他組」</li>
+          <li>「自動執行重複的回歸測試,我才有時間做新功能測試」</li>
+        </ul>
+      </div></details>
       <textarea data-sub="最希望" placeholder=""></textarea>
     </div>
 
     <div class="q" data-track data-q="Q16 其他想補充的困擾">
       <span class="q-label"><span class="q-num">Q16</span>還有什麼這份問卷沒問到、但你覺得很重要的問題或困擾?</span>
+      <details class="eg"><summary>看填答範例</summary><div class="eg-body">
+        <ul>
+          <li>「人力一直沒增加,需求量卻越來越多,常在趕,品質會受影響」</li>
+          <li>「自動化講了很多次,但每次工作太滿,沒辦法真的排時間做」</li>
+          <li>「需求文件品質不穩,有時清楚有時要自己猜,猜錯就重做」</li>
+        </ul>
+      </div></details>
       <textarea data-sub="其他補充" placeholder=""></textarea>
     </div>
   </section>
@@ -578,245 +689,276 @@
 <div class="toast" id="toast"></div>
 
 <script>
-(function(){
-  "use strict";
+  (function(){
+    "use strict";
 
-  /* ---------- dynamic step list ---------- */
-  var stepList = document.getElementById('stepList');
-  var addStepBtn = document.getElementById('addStep');
-  if(stepList && addStepBtn){
-    addStepBtn.addEventListener('click', function(){
-      var n = stepList.children.length + 1;
-      var row = document.createElement('div');
-      row.className = 'step-row';
-      row.innerHTML = '<span class="step-idx">'+n+'.</span><input type="text" class="step-in" placeholder="">';
-      stepList.appendChild(row);
-      row.querySelector('input').focus();
-      bindProgress(row.querySelector('input'));
-    });
-  }
-
-  /* ---------- flowchart editor return ---------- */
-  var FLOW_RETURN_KEY = 'qa_flow_markdown_return';
-  var flowMarkdown = document.getElementById('flowMarkdown');
-  var flowReturnStatus = document.getElementById('flowReturnStatus');
-  var openFlowEditorBtn = document.getElementById('openFlowEditor');
-  var clearFlowMdBtn = document.getElementById('clearFlowMd');
-
-  function setFlowMarkdown(md){
-    if(!flowMarkdown) return;
-    flowMarkdown.value = md || '';
-    flowMarkdown.dispatchEvent(new Event('input', {bubbles:true}));
-    if(flowReturnStatus){
-      flowReturnStatus.textContent = md && md.trim() ? '✓ 已回填流程圖 Markdown，可繼續填寫問卷' : '尚未回填流程圖 Markdown';
+    /* ---------- dynamic step list ---------- */
+    var stepList = document.getElementById('stepList');
+    var addStepBtn = document.getElementById('addStep');
+    if(stepList && addStepBtn){
+      addStepBtn.addEventListener('click', function(){
+        var n = stepList.children.length + 1;
+        var row = document.createElement('div');
+        row.className = 'step-row';
+        row.innerHTML = '<span class="step-idx">'+n+'.</span><input type="text" class="step-in" placeholder="">';
+        stepList.appendChild(row);
+        row.querySelector('input').focus();
+        bindProgress(row.querySelector('input'));
+      });
     }
-    updateProgress();
-  }
 
-  function flowEditorUrl(){
-    return './flow-editor.html?returnKey=' + encodeURIComponent(FLOW_RETURN_KEY);
-  }
+    /* ---------- flowchart editor return ---------- */
+    var FLOW_RETURN_KEY = 'qa_flow_markdown_return';
+    var flowMarkdown = document.getElementById('flowMarkdown');
+    var flowReturnStatus = document.getElementById('flowReturnStatus');
+    var openFlowEditorBtn = document.getElementById('openFlowEditor');
+    var clearFlowMdBtn = document.getElementById('clearFlowMd');
 
-  if(openFlowEditorBtn){
-    openFlowEditorBtn.setAttribute('href', flowEditorUrl());
-    openFlowEditorBtn.addEventListener('click', function(){
-      // 使用真正的超連結開新分頁，避免 window.open 在部分瀏覽器 / file:// 環境失效。
-      // 這裡只負責先把目前 Q1 內容暫存，讓流程圖頁可讀取既有內容。
-      try{ localStorage.setItem(FLOW_RETURN_KEY, flowMarkdown ? flowMarkdown.value : ''); }catch(e){}
-    });
-  }
-
-  if(clearFlowMdBtn){
-    clearFlowMdBtn.addEventListener('click', function(){
-      setFlowMarkdown('');
-      try{ localStorage.removeItem(FLOW_RETURN_KEY); }catch(e){}
-    });
-  }
-
-  window.addEventListener('message', function(event){
-    var data = event.data || {};
-    if(data.type === 'QA_FLOW_MD') setFlowMarkdown(data.md || '');
-  });
-  window.addEventListener('storage', function(event){
-    if(event.key === FLOW_RETURN_KEY && event.newValue !== null) setFlowMarkdown(event.newValue);
-  });
-  window.addEventListener('focus', function(){
-    try{
-      var md = localStorage.getItem(FLOW_RETURN_KEY);
-      if(md && flowMarkdown && md !== flowMarkdown.value) setFlowMarkdown(md);
-    }catch(e){}
-  });
-
-  /* ---------- percentage live total ---------- */
-  var pctSum = document.getElementById('pctSum');
-  var pctTotal = document.getElementById('pctTotal');
-  function num(v){ var n = parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?0:n; }
-  function updatePct(){
-    var t = 0;
-    document.querySelectorAll('.pct-input').forEach(function(i){ t += num(i.value); });
-    pctTotal.textContent = Math.round(t);
-    pctSum.classList.remove('ok','over');
-    if(t > 0 && t <= 100 && t >= 95) pctSum.classList.add('ok');
-    else if(t > 100) pctSum.classList.add('over');
-  }
-  document.querySelectorAll('.pct-input').forEach(function(i){ i.addEventListener('input', updatePct); });
-
-  /* ---------- progress meter ---------- */
-  var trackBlocks = Array.prototype.slice.call(document.querySelectorAll('.q[data-track]'));
-  var doneCount = document.getElementById('doneCount');
-  var meterFill = document.getElementById('meterFill');
-  function blockAnswered(block){
-    var ins = block.querySelectorAll('input, textarea');
-    for(var i=0;i<ins.length;i++){
-      var el = ins[i];
-      if((el.type==='radio'||el.type==='checkbox')){ if(el.checked) return true; }
-      else if(el.value && el.value.trim()!=='') return true;
+    function setFlowMarkdown(md){
+      if(!flowMarkdown) return;
+      flowMarkdown.value = md || '';
+      flowMarkdown.dispatchEvent(new Event('input', {bubbles:true}));
+      if(flowReturnStatus){
+        flowReturnStatus.textContent = md && md.trim() ? '✓ 已回填流程圖 Markdown，可繼續填寫問卷' : '尚未回填流程圖 Markdown';
+      }
+      updateProgress();
     }
-    return false;
-  }
-  function updateProgress(){
-    var done = 0;
-    trackBlocks.forEach(function(b){ if(blockAnswered(b)) done++; });
-    doneCount.textContent = done;
-    meterFill.style.width = (done/trackBlocks.length*100)+'%';
-  }
-  function bindProgress(el){
-    var ev = (el.type==='radio'||el.type==='checkbox') ? 'change' : 'input';
-    el.addEventListener(ev, updateProgress);
-  }
-  document.querySelectorAll('input, textarea').forEach(bindProgress);
 
-  /* ---------- collect answers ---------- */
-  function checkedRadio(name){
-    var el = document.querySelector('input[name="'+name+'"]:checked');
-    return el ? el.value : '';
-  }
-  function checkedBoxes(scope){
-    var out = [];
-    scope.querySelectorAll('input[type=checkbox]:checked').forEach(function(c){
-      var v = c.value;
-      if(c.parentElement.hasAttribute('data-other')){
-        var free = c.parentElement.querySelector('.free');
+    function flowEditorUrl(){
+      return './flow-editor.html?returnKey=' + encodeURIComponent(FLOW_RETURN_KEY);
+    }
+
+    if(openFlowEditorBtn){
+      openFlowEditorBtn.setAttribute('href', flowEditorUrl());
+      openFlowEditorBtn.addEventListener('click', function(){
+        // 使用真正的超連結開新分頁，避免 window.open 在部分瀏覽器 / file:// 環境失效。
+        // 這裡只負責先把目前 Q1 內容暫存，讓流程圖頁可讀取既有內容。
+        try{ localStorage.setItem(FLOW_RETURN_KEY, flowMarkdown ? flowMarkdown.value : ''); }catch(e){}
+      });
+    }
+
+    if(clearFlowMdBtn){
+      clearFlowMdBtn.addEventListener('click', function(){
+        setFlowMarkdown('');
+        try{ localStorage.removeItem(FLOW_RETURN_KEY); }catch(e){}
+      });
+    }
+
+    window.addEventListener('message', function(event){
+      var data = event.data || {};
+      if(data.type === 'QA_FLOW_MD') setFlowMarkdown(data.md || '');
+    });
+    window.addEventListener('storage', function(event){
+      if(event.key === FLOW_RETURN_KEY && event.newValue !== null) setFlowMarkdown(event.newValue);
+    });
+    window.addEventListener('focus', function(){
+      try{
+        var md = localStorage.getItem(FLOW_RETURN_KEY);
+        if(md && flowMarkdown && md !== flowMarkdown.value) setFlowMarkdown(md);
+      }catch(e){}
+    });
+
+
+    /* ---------- percentage live total ---------- */
+    var pctSum = document.getElementById('pctSum');
+    var pctTotal = document.getElementById('pctTotal');
+    function num(v){ var n = parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?0:n; }
+    function updatePct(){
+      var t = 0;
+      document.querySelectorAll('.pct-input').forEach(function(i){ t += num(i.value); });
+      pctTotal.textContent = Math.round(t);
+      pctSum.classList.remove('ok','over');
+      if(t > 0 && t <= 100 && t >= 95) pctSum.classList.add('ok');
+      else if(t > 100) pctSum.classList.add('over');
+    }
+    document.querySelectorAll('.pct-input').forEach(function(i){ i.addEventListener('input', updatePct); });
+
+    /* ---------- progress meter ---------- */
+    var trackBlocks = Array.prototype.slice.call(document.querySelectorAll('.q[data-track]'));
+    var doneCount = document.getElementById('doneCount');
+    var meterFill = document.getElementById('meterFill');
+    function blockAnswered(block){
+      var ins = block.querySelectorAll('input, textarea');
+      for(var i=0;i<ins.length;i++){
+        var el = ins[i];
+        if((el.type==='radio'||el.type==='checkbox')){ if(el.checked) return true; }
+        else if(el.value && el.value.trim()!=='') return true;
+      }
+      return false;
+    }
+    function updateProgress(){
+      var done = 0;
+      trackBlocks.forEach(function(b){ if(blockAnswered(b)) done++; });
+      doneCount.textContent = done;
+      meterFill.style.width = (done/trackBlocks.length*100)+'%';
+    }
+    function bindProgress(el){
+      var ev = (el.type==='radio'||el.type==='checkbox') ? 'change' : 'input';
+      el.addEventListener(ev, updateProgress);
+    }
+    document.querySelectorAll('input, textarea').forEach(bindProgress);
+
+    /* ---------- "其他" free-text: typing auto-selects its option; click won't toggle ---------- */
+    document.querySelectorAll('.opt .free').forEach(function(free){
+      var ctrl = free.parentElement.querySelector('input[type=radio], input[type=checkbox]');
+      free.addEventListener('click', function(e){ e.stopPropagation(); });
+      free.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+      free.addEventListener('focus', function(){
+        if(ctrl && !ctrl.checked){ ctrl.checked = true; updateProgress(); }
+      });
+      free.addEventListener('input', function(){
+        if(ctrl && !ctrl.checked){ ctrl.checked = true; }
+        updateProgress();
+      });
+    });
+
+    /* ---------- collect answers ---------- */
+    function checkedRadio(name){
+      var el = document.querySelector('input[name="'+name+'"]:checked');
+      if(!el) return '';
+      var v = el.value;
+      if(el.parentElement.hasAttribute('data-other')){
+        var free = el.parentElement.querySelector('.free');
         if(free && free.value.trim()) v = '其他:'+free.value.trim();
       }
-      out.push(v);
-    });
-    return out.join('、');
-  }
-  function collect(){
-    var L = [];
-    L.push('===== 測試組現況問卷 · 填答內容 =====');
-    L.push('');
-    document.querySelectorAll('section.block').forEach(function(sec){
-      L.push('【'+sec.querySelector('.sec-num').textContent+'. '+sec.querySelector('.sec-title').textContent+'】');
-
-      sec.querySelectorAll('.q').forEach(function(q){
-        var label = q.getAttribute('data-q');
-
-        // basic-info single input (data-q lives on the input itself)
-        if(!label){
-          var self = q.querySelector('input[data-q]');
-          if(self){ L.push('- '+self.getAttribute('data-q')+':'+(self.value.trim()||'(未填)')); }
-          return;
-        }
-
-        // flowchart markdown returned from editor
-        if(q.querySelector('.flow-md')){
-          var md = q.querySelector('.flow-md').value.trim();
-          L.push('- '+label+':');
-          if(md){
-            L.push('');
-            L.push(md);
-            L.push('');
-          }else{
-            L.push('    (未回填)');
-          }
-          return;
-        }
-
-        // step list
-        if(q.querySelector('.steps')){
-          L.push('- '+label+':');
-          q.querySelectorAll('.step-in').forEach(function(s,idx){
-            if(s.value.trim()) L.push('    '+(idx+1)+'. '+s.value.trim());
-          });
-          return;
-        }
-
-        // percentage table
-        if(q.querySelector('.pct-table')){
-          var parts=[];
-          q.querySelectorAll('.pct-input').forEach(function(p){
-            if(p.value.trim()) parts.push(p.getAttribute('data-pct')+' '+num(p.value)+'%');
-          });
-          L.push('- '+label+':'+(parts.length?' '+parts.join('、'):' (未填)'));
-          return;
-        }
-
-        // header line based on primary control
-        var radio = q.querySelector('input[type=radio]');
-        var box = q.querySelector('input[type=checkbox]');
-        var subs = q.querySelectorAll('[data-sub]');
-
-        if(radio){
-          L.push('- '+label+':'+(checkedRadio(radio.name)||'(未選)'));
-        } else if(box){
-          L.push('- '+label+':'+(checkedBoxes(q)||'(未選)'));
-        } else {
-          L.push('- '+label+(subs.length?':':':(未填)'));
-        }
-
-        // sub-labelled fields
-        subs.forEach(function(f){
-          if(f.value && f.value.trim()) L.push('    · '+f.getAttribute('data-sub')+':'+f.value.trim());
-        });
-      });
-
-      L.push('');
-    });
-    return L.join('\n');
-  }
-
-  /* ---------- export actions ---------- */
-  var toast = document.getElementById('toast');
-  var toastTimer;
-  function showToast(msg){
-    toast.textContent = msg; toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
-  }
-  var status = document.getElementById('exportStatus');
-
-  document.getElementById('btnCopy').addEventListener('click', function(){
-    var text = collect();
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){
-        showToast('已複製,貼上後回傳給我即可');
-        status.textContent = '✓ 內容已複製到剪貼簿';
-      }, fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
-      ta.select(); try{document.execCommand('copy'); showToast('已複製');}catch(e){showToast('複製失敗,請改用下載');}
-      document.body.removeChild(ta);
+      return v;
     }
-  });
+    function checkedBoxes(scope){
+      var out = [];
+      scope.querySelectorAll('input[type=checkbox]:checked').forEach(function(c){
+        var v = c.value;
+        if(c.parentElement.hasAttribute('data-other')){
+          var free = c.parentElement.querySelector('.free');
+          if(free && free.value.trim()) v = '其他:'+free.value.trim();
+        }
+        out.push(v);
+      });
+      return out.join('、');
+    }
+    function collect(){
+      var L = [];
+      L.push('===== 測試組現況問卷 · 填答內容 =====');
+      L.push('');
+      document.querySelectorAll('section.block').forEach(function(sec){
+        L.push('【'+sec.querySelector('.sec-num').textContent+'. '+sec.querySelector('.sec-title').textContent+'】');
 
-  document.getElementById('btnDownload').addEventListener('click', function(){
-    var text = collect();
-    var name = (document.getElementById('f-name').value.trim() || '測試組問卷');
-    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name + '_問卷填答.txt';
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 100);
-    showToast('已開始下載');
-    status.textContent = '✓ 已下載文字檔';
-  });
+        sec.querySelectorAll('.q').forEach(function(q){
+          var label = q.getAttribute('data-q');
 
-  updateProgress();
-})();
+          // basic-info single input (data-q lives on the input itself)
+          if(!label){
+            var self = q.querySelector('input[data-q]');
+            if(self){ L.push('- '+self.getAttribute('data-q')+':'+(self.value.trim()||'(未填)')); }
+            return;
+          }
+
+          // flowchart markdown returned from editor
+          if(q.querySelector('.flow-md')){
+            var md = q.querySelector('.flow-md').value.trim();
+            L.push('- '+label+':');
+            if(md){
+              L.push('');
+              L.push(md);
+              L.push('');
+            }else{
+              L.push('    (未回填)');
+            }
+            return;
+          }
+
+          // step list
+          if(q.querySelector('.steps')){
+            L.push('- '+label+':');
+            q.querySelectorAll('.step-in').forEach(function(s,idx){
+              if(s.value.trim()) L.push('    '+(idx+1)+'. '+s.value.trim());
+            });
+            return;
+          }
+
+          // percentage table
+          if(q.querySelector('.pct-table')){
+            var parts=[];
+            q.querySelectorAll('.pct-input').forEach(function(p){
+              if(p.value.trim()) parts.push(p.getAttribute('data-pct')+' '+num(p.value)+'%');
+            });
+            L.push('- '+label+':'+(parts.length?' '+parts.join('、'):' (未填)'));
+            return;
+          }
+
+          // header line based on primary control
+          var radios = q.querySelectorAll('input[type=radio]');
+          var box = q.querySelector('input[type=checkbox]');
+          var subs = q.querySelectorAll('[data-sub]');
+
+          if(radios.length){
+            var seen = [];
+            radios.forEach(function(r){ if(seen.indexOf(r.name)<0) seen.push(r.name); });
+            L.push('- '+label+':'+(checkedRadio(seen[0])||'(未選)'));
+            for(var gi=1; gi<seen.length; gi++){
+              var v = checkedRadio(seen[gi]);
+              if(v){
+                var opts = q.querySelector('.opts[data-name="'+seen[gi]+'"]');
+                var lab = opts && opts.parentElement.querySelector('.sub-label');
+                L.push('    · '+(lab?lab.textContent.trim():'補充')+':'+v);
+              }
+            }
+          } else if(box){
+            L.push('- '+label+':'+(checkedBoxes(q)||'(未選)'));
+          } else {
+            L.push('- '+label+(subs.length?':':':(未填)'));
+          }
+
+          // sub-labelled fields
+          subs.forEach(function(f){
+            if(f.value && f.value.trim()) L.push('    · '+f.getAttribute('data-sub')+':'+f.value.trim());
+          });
+        });
+
+        L.push('');
+      });
+      return L.join('\n');
+    }
+
+    /* ---------- export actions ---------- */
+    var toast = document.getElementById('toast');
+    var toastTimer;
+    function showToast(msg){
+      toast.textContent = msg; toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+    }
+    var status = document.getElementById('exportStatus');
+
+    document.getElementById('btnCopy').addEventListener('click', function(){
+      var text = collect();
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          showToast('已複製,貼上後回傳給我即可');
+          status.textContent = '✓ 內容已複製到剪貼簿';
+        }, fallback);
+      } else { fallback(); }
+      function fallback(){
+        var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+        ta.select(); try{document.execCommand('copy'); showToast('已複製');}catch(e){showToast('複製失敗,請改用下載');}
+        document.body.removeChild(ta);
+      }
+    });
+
+    document.getElementById('btnDownload').addEventListener('click', function(){
+      var text = collect();
+      var name = (document.getElementById('f-name').value.trim() || '測試組問卷');
+      var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name + '_問卷填答.txt';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 100);
+      showToast('已開始下載');
+      status.textContent = '✓ 已下載文字檔';
+    });
+
+    updateProgress();
+  })();
 </script>
 </body>
 </html>
