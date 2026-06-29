@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1FB6C9"/>
+      <stop offset="1" stop-color="#3CB54A"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#bg)"/>
+  <!-- clipboard board -->
+  <rect x="16" y="16" width="29" height="34" rx="4" fill="#2B3A4A"/>
+  <!-- paper -->
+  <rect x="19" y="20" width="23" height="27" rx="2" fill="#FFFFFF"/>
+  <!-- clip -->
+  <rect x="26" y="13.5" width="9" height="6" rx="2" fill="#C9D2DA"/>
+  <circle cx="30.5" cy="14.5" r="1.3" fill="#2B3A4A"/>
+  <!-- check 1 -->
+  <rect x="21.5" y="24" width="5" height="5" rx="1.2" fill="#3CB54A"/>
+  <path d="M22.6 26.5l1.2 1.2 2-2.4" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="28.5" y="25.6" width="11" height="1.6" rx="0.8" fill="#AEBAC4"/>
+  <!-- check 2 -->
+  <rect x="21.5" y="31" width="5" height="5" rx="1.2" fill="#3CB54A"/>
+  <path d="M22.6 33.5l1.2 1.2 2-2.4" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="28.5" y="32.6" width="11" height="1.6" rx="0.8" fill="#AEBAC4"/>
+  <!-- empty box -->
+  <rect x="21.5" y="38" width="5" height="5" rx="1.2" fill="none" stroke="#3CB54A" stroke-width="1.2"/>
+  <rect x="28.5" y="39.6" width="8" height="1.6" rx="0.8" fill="#AEBAC4"/>
+  <!-- pencil -->
+  <g transform="rotate(45 45 38)">
+    <rect x="41.5" y="22" width="7" height="22" rx="1" fill="#F6A623"/>
+    <rect x="41.5" y="22" width="7" height="5" rx="1" fill="#E8504B"/>
+    <rect x="41.5" y="27" width="7" height="1.6" fill="#D7DCE0"/>
+    <path d="M41.5 44 L45 49 L48.5 44 Z" fill="#F2C994"/>
+    <path d="M43.7 47 L45 49 L46.3 47 Z" fill="#2B3A4A"/>
+  </g>
+</svg>
